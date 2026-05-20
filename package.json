@@ -1,0 +1,16 @@
+{
+  "name": "plagiarism-checker-monorepo",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:be": "cd backend && bun run dev",
+    "dev:fe": "cd frontend && bun run dev",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"bgBlue,bgGreen\" \"bun run dev:be\" \"bun run dev:fe\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
