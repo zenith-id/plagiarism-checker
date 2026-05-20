@@ -32,11 +32,13 @@
 #### Project Documentation
 
 - **Date:** 2026-05-20
-- **Commits:** `f6e30f1`, `8171b5c`
+- **Commits:** `f6e30f1`, `8171b5c`, `236fcc4`, `0974207`
 - Add README.md with setup instructions and API reference
 - Add PRD.md with product requirements
 - Add DESIGN.md with design system guidelines
 - Add AGENTS.md with developer guidelines
+- Add CHANGELOG.md placeholder
+- Update CHANGES.md with all commit hashes
 
 ---
 
