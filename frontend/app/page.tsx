@@ -1,18 +1,46 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { uploadFiles, analyzeFiles, getResults, getRanking, getGraph, resetData, exportPDF, type FileRanking, type SimilarityResult, type Settings, type GraphNode, type GraphEdge } from "@/lib/api";
+import {
+  uploadFiles,
+  analyzeFiles,
+  getResults,
+  getRanking,
+  resetData,
+  exportPDF,
+  type FileRanking,
+  type SimilarityResult,
+  type Settings,
+  type ParsedFile,
+} from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 import { uploadSchema } from "@/lib/schemas";
-import dynamic from "next/dynamic";
-const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), { ssr: false });
-import { Upload, FileText, AlertCircle, CheckCircle, Loader2, BarChart3, Settings as SettingsIcon, RotateCcw, X, FileDown, ArrowUpDown, Filter, AlertTriangle, ChevronUp, Users, GitGraph, Link2 } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+  BarChart3,
+  Settings as SettingsIcon,
+  RotateCcw,
+  X,
+  FileDown,
+  ArrowUpDown,
+  Filter,
+  AlertTriangle,
+  ChevronUp,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
   const [dragActive, setDragActive] = useState(false);
-  const [sortBy, setSortBy] = useState<"normal" | "strict" | "overlap">("normal");
+  const [sortBy, setSortBy] = useState<"normal" | "strict" | "overlap">(
+    "normal",
+  );
   const [filterThreshold, setFilterThreshold] = useState(0);
   const [showFloating, setShowFloating] = useState(false);
 
@@ -25,10 +53,13 @@ export default function Home() {
     removeSelectedFile,
     setCourseName,
     setMessage,
-    setResults,
   } = useAppStore();
 
-  const { data: resultsData, refetch: refetchResults, isLoading: resultsLoading } = useQuery({
+  const {
+    data: resultsData,
+    refetch: refetchResults,
+    isLoading: resultsLoading,
+  } = useQuery({
     queryKey: ["results"],
     queryFn: () => getResults(filterThreshold || undefined),
     enabled: false,
@@ -40,28 +71,22 @@ export default function Home() {
     enabled: !!resultsData && resultsData.results.length > 0,
   });
 
-  const { data: graphData } = useQuery({
-    queryKey: ["graph", filterThreshold],
-    queryFn: () => getGraph(filterThreshold || undefined),
-    enabled: !!resultsData && resultsData.results.length > 0,
-  });
-
-  useEffect(() => {
-    if (resultsData?.results) {
-      setResults(resultsData.results);
-      setShowFloating(true);
-    }
-  }, [resultsData, setResults]);
-
   const uploadMutation = useMutation({
     mutationFn: uploadFiles,
     onSuccess: (data) => {
       setMessage({ type: "success", text: data.message });
       setSelectedFiles([]);
-      refetchResults();
+      refetchResults().then(({ data: nextResults }) => {
+        if (nextResults?.results) {
+          setShowFloating(true);
+        }
+      });
     },
     onError: (error: any) => {
-      setMessage({ type: "error", text: error.response?.data?.error || "Gagal mengunggah file" });
+      setMessage({
+        type: "error",
+        text: error.response?.data?.error || "Gagal mengunggah file",
+      });
     },
   });
 
@@ -69,10 +94,17 @@ export default function Home() {
     mutationFn: (course?: string) => analyzeFiles(course),
     onSuccess: () => {
       setMessage({ type: "success", text: "Analisis selesai!" });
-      refetchResults();
+      refetchResults().then(({ data: nextResults }) => {
+        if (nextResults?.results) {
+          setShowFloating(true);
+        }
+      });
     },
     onError: (error: any) => {
-      setMessage({ type: "error", text: error.response?.data?.error || "Gagal menganalisis" });
+      setMessage({
+        type: "error",
+        text: error.response?.data?.error || "Gagal menganalisis",
+      });
     },
   });
 
@@ -95,12 +127,15 @@ export default function Home() {
     }
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    addSelectedFiles(Array.from(e.dataTransfer.files));
-  }, [addSelectedFiles]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragActive(false);
+      addSelectedFiles(Array.from(e.dataTransfer.files));
+    },
+    [addSelectedFiles],
+  );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -109,7 +144,10 @@ export default function Home() {
   };
 
   const handleUpload = () => {
-    const validation = uploadSchema.safeParse({ files: selectedFiles, courseName });
+    const validation = uploadSchema.safeParse({
+      files: selectedFiles,
+      courseName,
+    });
     if (!validation.success) {
       const firstError = validation.error.issues[0]?.message;
       setMessage({ type: "error", text: firstError || "Validasi gagal" });
@@ -154,12 +192,25 @@ export default function Home() {
   };
 
   const getStatusBadge = (score: number) => {
-    if (score >= threshold) return { label: "Plagiarisme Tinggi", bg: "bg-error/10 text-error border border-error/30" };
-    if (score >= warning) return { label: "Plagiarisme Sedang", bg: "bg-warning/10 text-warning border border-warning/30" };
-    return { label: "Aman", bg: "bg-success/10 text-success border border-success/30" };
+    if (score >= threshold)
+      return {
+        label: "Plagiarisme Tinggi",
+        bg: "bg-error/10 text-error border border-error/30",
+      };
+    if (score >= warning)
+      return {
+        label: "Plagiarisme Sedang",
+        bg: "bg-warning/10 text-warning border border-warning/30",
+      };
+    return {
+      label: "Aman",
+      bg: "bg-success/10 text-success border border-success/30",
+    };
   };
 
-  const sortedResults: SimilarityResult[] = [...(resultsData?.results || [])].sort((a, b) => {
+  const sortedResults: SimilarityResult[] = [
+    ...(resultsData?.results || []),
+  ].sort((a, b) => {
     if (sortBy === "normal") return b.normalScore - a.normalScore;
     if (sortBy === "strict") return b.strictScore - a.strictScore;
     return b.wordOverlap - a.wordOverlap;
@@ -167,19 +218,36 @@ export default function Home() {
 
   const totalFiles = resultsData?.files.length || 0;
   const totalPairs = resultsData?.results.length || 0;
-  const highRiskCount = (resultsData?.results || []).filter((r) => r.normalScore >= threshold).length;
-  const safeCount = (resultsData?.results || []).filter((r) => r.normalScore < warning).length;
-  const avgSimilarity = totalPairs > 0
-    ? Math.round(((resultsData?.results || []).reduce((sum, r) => sum + r.normalScore, 0) / totalPairs) * 100) / 100
-    : 0;
+  const highRiskCount = (resultsData?.results || []).filter(
+    (r) => r.normalScore >= threshold,
+  ).length;
+  const safeCount = (resultsData?.results || []).filter(
+    (r) => r.normalScore < warning,
+  ).length;
+  const avgSimilarity =
+    totalPairs > 0
+      ? Math.round(
+          ((resultsData?.results || []).reduce(
+            (sum, r) => sum + r.normalScore,
+            0,
+          ) /
+            totalPairs) *
+            100,
+        ) / 100
+      : 0;
 
-  const ranking = rankingData?.ranking || [];
+  const ranking = getCompleteRanking(
+    resultsData?.files || [],
+    rankingData?.ranking || [],
+  );
   const hasResults = totalPairs > 0;
 
   return (
     <div className="flex-1 flex flex-col bg-canvas">
       <header className="h-16 bg-canvas border-b border-hairline flex items-center justify-between px-6 sticky top-0 z-20">
-        <h1 className="text-xl font-display tracking-tight text-ink">Pemeriksa Plagiarisme</h1>
+        <h1 className="text-xl font-display tracking-tight text-ink">
+          Pemeriksa Plagiarisme
+        </h1>
         <div className="flex items-center gap-3">
           {hasResults && (
             <button
@@ -190,7 +258,10 @@ export default function Home() {
               Export PDF
             </button>
           )}
-          <Link href="/settings" className="p-2 rounded-md hover:bg-canvas-card transition-colors">
+          <Link
+            href="/settings"
+            className="p-2 rounded-md hover:bg-canvas-card transition-colors"
+          >
             <SettingsIcon className="w-5 h-5 text-muted" />
           </Link>
           <button
@@ -218,13 +289,6 @@ export default function Home() {
           >
             <FileText className="w-4 h-4 text-primary" />
             Ranking
-          </button>
-          <button
-            onClick={() => scrollToSection("graph")}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-canvas-soft transition-colors text-sm w-full text-left text-body"
-          >
-            <GitGraph className="w-4 h-4 text-primary" />
-            Graph
           </button>
           <button
             onClick={() => scrollToSection("pairs")}
@@ -268,19 +332,27 @@ export default function Home() {
               <AlertCircle className="w-5 h-5 shrink-0" />
             )}
             <p className="text-sm">{message.text}</p>
-            <button onClick={() => setMessage(null)} className="ml-auto text-sm underline">Tutup</button>
+            <button
+              onClick={() => setMessage(null)}
+              className="ml-auto text-sm underline"
+            >
+              Tutup
+            </button>
           </div>
         )}
 
         <section className="bg-canvas-card rounded-xl p-8 border border-hairline">
           <h2 className="text-2xl mb-4 text-ink">Unggah File</h2>
           <p className="text-body mb-6 text-sm">
-            Format didukung: .txt, .docx, .pdf. Maksimal 200 file, 10MB per file.
+            Format didukung: .txt, .docx, .pdf. Maksimal 200 file, 10MB per
+            file.
           </p>
 
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive ? "border-primary bg-primary/5" : "border-hairline hover:border-primary/50"
+              dragActive
+                ? "border-primary bg-primary/5"
+                : "border-hairline hover:border-primary/50"
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -291,22 +363,38 @@ export default function Home() {
             <p className="text-body mb-2">Seret file ke sini atau</p>
             <label className="inline-block px-4 py-2 bg-primary text-on-primary rounded-md cursor-pointer hover:bg-primary-active transition-colors text-sm">
               Pilih File
-              <input type="file" multiple accept=".txt,.docx,.pdf" onChange={handleFileSelect} className="hidden" />
+              <input
+                type="file"
+                multiple
+                accept=".txt,.docx,.pdf"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
             </label>
           </div>
 
           {selectedFiles.length > 0 && (
             <div className="mt-6 space-y-2">
-              <p className="text-sm text-muted">{selectedFiles.length} file dipilih</p>
+              <p className="text-sm text-muted">
+                {selectedFiles.length} file dipilih
+              </p>
               <div className="max-h-48 overflow-y-auto space-y-1">
                 {selectedFiles.map((file: File, i: number) => (
-                  <div key={i} className="flex items-center justify-between p-2 bg-canvas rounded-md text-sm">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-2 bg-canvas rounded-md text-sm"
+                  >
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-muted" />
                       <span className="truncate max-w-xs">{file.name}</span>
-                      <span className="text-muted-soft text-xs">({(file.size / 1024).toFixed(1)} KB)</span>
+                      <span className="text-muted-soft text-xs">
+                        ({(file.size / 1024).toFixed(1)} KB)
+                      </span>
                     </div>
-                    <button onClick={() => removeSelectedFile(i)} className="p-1 text-error hover:text-error/80">
+                    <button
+                      onClick={() => removeSelectedFile(i)}
+                      className="p-1 text-error hover:text-error/80"
+                    >
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -322,8 +410,13 @@ export default function Home() {
               className="px-6 py-2.5 bg-primary text-on-primary rounded-md hover:bg-primary-active transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-2"
             >
               {uploadMutation.isPending ? (
-                <><Loader2 className="w-4 h-4 animate-spin" />Mengunggah...</>
-              ) : "Unggah File"}
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Mengunggah...
+                </>
+              ) : (
+                "Unggah File"
+              )}
             </button>
             <button
               onClick={handleAnalyze}
@@ -331,15 +424,23 @@ export default function Home() {
               className="px-6 py-2.5 bg-canvas text-ink border border-hairline rounded-md hover:bg-canvas-card transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center gap-2"
             >
               {analyzeMutation.isPending ? (
-                <><Loader2 className="w-4 h-4 animate-spin" />Menganalisis...</>
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Menganalisis...
+                </>
               ) : (
-                <><BarChart3 className="w-4 h-4" />Analisis</>
+                <>
+                  <BarChart3 className="w-4 h-4" />
+                  Analisis
+                </>
               )}
             </button>
           </div>
 
           <div className="mt-4">
-            <label className="text-sm text-muted block mb-1">Nama Mata Kuliah (opsional, untuk mode strict)</label>
+            <label className="text-sm text-muted block mb-1">
+              Nama Mata Kuliah (opsional, untuk mode strict)
+            </label>
             <input
               type="text"
               value={courseName}
@@ -371,7 +472,9 @@ export default function Home() {
                   onChange={(e) => setFilterThreshold(Number(e.target.value))}
                   className="w-32 accent-primary"
                 />
-                <span className="text-sm text-ink font-medium">{filterThreshold}%</span>
+                <span className="text-sm text-ink font-medium">
+                  {filterThreshold}%
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -379,7 +482,9 @@ export default function Home() {
                 <label className="text-sm text-muted">Urutkan:</label>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as "normal" | "strict" | "overlap")}
+                  onChange={(e) =>
+                    setSortBy(e.target.value as "normal" | "strict" | "overlap")
+                  }
                   className="px-3 py-1.5 bg-canvas border border-hairline rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
                   <option value="normal">Similarity Normal</option>
@@ -404,15 +509,25 @@ export default function Home() {
                   <p className="text-xs text-muted mt-1">Total Pasangan</p>
                 </div>
                 <div className="bg-canvas-card rounded-xl p-4 text-center border border-hairline">
-                  <p className={`text-3xl font-display ${getScoreColor(avgSimilarity)}`}>{avgSimilarity}%</p>
-                  <p className="text-xs text-muted mt-1">Rata-rata Similarity</p>
+                  <p
+                    className={`text-3xl font-display ${getScoreColor(avgSimilarity)}`}
+                  >
+                    {avgSimilarity}%
+                  </p>
+                  <p className="text-xs text-muted mt-1">
+                    Rata-rata Similarity
+                  </p>
                 </div>
                 <div className="bg-canvas-card rounded-xl p-4 text-center border border-hairline">
-                  <p className="text-3xl font-display text-error">{highRiskCount}</p>
+                  <p className="text-3xl font-display text-error">
+                    {highRiskCount}
+                  </p>
                   <p className="text-xs text-muted mt-1">Risiko Tinggi</p>
                 </div>
                 <div className="bg-canvas-card rounded-xl p-4 text-center border border-hairline">
-                  <p className="text-3xl font-display text-success">{safeCount}</p>
+                  <p className="text-3xl font-display text-success">
+                    {safeCount}
+                  </p>
                   <p className="text-xs text-muted mt-1">Aman</p>
                 </div>
               </div>
@@ -421,50 +536,197 @@ export default function Home() {
             <section id="ranking" className="scroll-mt-24">
               <h2 className="text-lg font-display mb-4 text-ink flex items-center gap-2">
                 <FileText className="w-5 h-5 text-primary" />
-                Ranking per File
+                Ranking per File ({ranking.length}/{totalFiles})
               </h2>
               <div className="bg-canvas-card rounded-xl border border-hairline overflow-hidden">
-                <div className="overflow-x-auto">
+                <div className="border-b border-hairline bg-canvas px-4 py-3 text-xs text-muted">
+                  Semua file ditampilkan pada ranking, termasuk file dengan
+                  similarity 0%.
+                </div>
+                <div className="grid gap-3 p-3 md:hidden">
+                  {ranking.map((file: FileRanking, idx: number) => {
+                    const status = getStatusBadge(file.maxSimilarity);
+                    const firstPair = resultsData?.results.find(
+                      (r) => r.fileAId === file.id || r.fileBId === file.id,
+                    );
+                    const otherId = firstPair
+                      ? firstPair.fileAId === file.id
+                        ? firstPair.fileBId
+                        : firstPair.fileAId
+                      : null;
+
+                    return (
+                      <div
+                        key={file.id}
+                        className="rounded-xl border border-hairline bg-canvas p-4 space-y-3"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-xs text-muted">#{idx + 1}</p>
+                            <p
+                              className="mt-1 truncate text-sm font-medium text-ink"
+                              title={file.name}
+                            >
+                              {file.name}
+                            </p>
+                          </div>
+                          <div
+                            className={`rounded-lg px-3 py-2 text-right ${getScoreBg(file.maxSimilarity)}`}
+                          >
+                            <p className="text-[11px] uppercase tracking-wide text-muted">
+                              Similarity
+                            </p>
+                            <p
+                              className={`text-lg font-display font-semibold ${getScoreColor(file.maxSimilarity)}`}
+                            >
+                              {file.maxSimilarity}%
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          <span
+                            className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${status.bg}`}
+                          >
+                            {status.label}
+                          </span>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+                              file.metadataStatus === "Mencurigakan"
+                                ? "bg-error/10 text-error"
+                                : "bg-success/10 text-success"
+                            }`}
+                          >
+                            {file.metadataStatus === "Mencurigakan" ? (
+                              <AlertTriangle className="w-3 h-3" />
+                            ) : (
+                              <CheckCircle className="w-3 h-3" />
+                            )}
+                            {file.metadataStatus}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div className="rounded-lg bg-canvas-card px-3 py-2">
+                            <p className="text-[11px] uppercase tracking-wide text-muted">
+                              Rata-rata
+                            </p>
+                            <p className="mt-1 font-medium text-ink">
+                              {file.avgSimilarity}%
+                            </p>
+                          </div>
+                          <div className="rounded-lg bg-canvas-card px-3 py-2">
+                            <p className="text-[11px] uppercase tracking-wide text-muted">
+                              Jumlah Pair
+                            </p>
+                            <p className="mt-1 font-medium text-ink">
+                              {file.pairCount}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="rounded-lg bg-canvas-card px-3 py-2 text-sm">
+                          <p className="text-[11px] uppercase tracking-wide text-muted">
+                            Last Modified By
+                          </p>
+                          <p className="mt-1 truncate text-ink">
+                            {file.lastModifiedBy}
+                          </p>
+                        </div>
+
+                        {otherId ? (
+                          <Link
+                            href={`/detail/${file.id}/${otherId}`}
+                            className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                          >
+                            Buka Detail
+                          </Link>
+                        ) : (
+                          <span className="inline-flex rounded-lg bg-canvas-card px-3 py-2 text-xs text-muted">
+                            Belum ada pasangan
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="hidden overflow-x-auto md:block">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-canvas-soft border-b border-hairline">
-                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">#</th>
-                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">File</th>
-                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">Status</th>
-                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">Similarity</th>
-                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">Rata-rata</th>
-                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">Metadata</th>
-                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">Last Modified By</th>
-                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">Detail</th>
+                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">
+                          #
+                        </th>
+                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">
+                          File
+                        </th>
+                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">
+                          Status
+                        </th>
+                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">
+                          Similarity
+                        </th>
+                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">
+                          Rata-rata
+                        </th>
+                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">
+                          Metadata
+                        </th>
+                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">
+                          Last Modified By
+                        </th>
+                        <th className="p-3 text-left text-muted font-medium text-xs uppercase tracking-wide">
+                          Detail
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {ranking.map((file: FileRanking, idx: number) => {
                         const status = getStatusBadge(file.maxSimilarity);
                         return (
-                          <tr key={file.id} className="border-b border-hairline/50 last:border-0 hover:bg-canvas-soft/50 transition-colors">
-                            <td className="p-3 text-muted text-xs">{idx + 1}</td>
+                          <tr
+                            key={file.id}
+                            className="border-b border-hairline/50 last:border-0 hover:bg-canvas-soft/50 transition-colors"
+                          >
+                            <td className="p-3 text-muted text-xs">
+                              {idx + 1}
+                            </td>
                             <td className="p-3">
                               <div className="flex items-center gap-2">
                                 <FileText className="w-4 h-4 text-muted shrink-0" />
-                                <span className="truncate max-w-[180px]" title={file.name}>{file.name}</span>
+                                <span
+                                  className="truncate max-w-[180px]"
+                                  title={file.name}
+                                >
+                                  {file.name}
+                                </span>
                               </div>
                             </td>
                             <td className="p-3">
-                              <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${status.bg}`}>
+                              <span
+                                className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${status.bg}`}
+                              >
                                 {status.label}
                               </span>
                             </td>
                             <td className="p-3">
-                              <span className={`font-display font-semibold ${getScoreColor(file.maxSimilarity)}`}>
+                              <span
+                                className={`font-display font-semibold ${getScoreColor(file.maxSimilarity)}`}
+                              >
                                 {file.maxSimilarity}%
                               </span>
                             </td>
-                            <td className="p-3 text-body font-medium">{file.avgSimilarity}%</td>
+                            <td className="p-3 text-body font-medium">
+                              {file.avgSimilarity}%
+                            </td>
                             <td className="p-3">
-                              <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
-                                file.metadataStatus === "Mencurigakan" ? "bg-error/10 text-error" : "bg-success/10 text-success"
-                              }`}>
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+                                  file.metadataStatus === "Mencurigakan"
+                                    ? "bg-error/10 text-error"
+                                    : "bg-success/10 text-success"
+                                }`}
+                              >
                                 {file.metadataStatus === "Mencurigakan" ? (
                                   <AlertTriangle className="w-3 h-3" />
                                 ) : (
@@ -473,14 +735,26 @@ export default function Home() {
                                 {file.metadataStatus}
                               </span>
                             </td>
-                            <td className="p-3 text-muted text-xs max-w-[150px] truncate">{file.lastModifiedBy}</td>
+                            <td className="p-3 text-muted text-xs max-w-[150px] truncate">
+                              {file.lastModifiedBy}
+                            </td>
                             <td className="p-3">
                               {(() => {
                                 const firstPair = resultsData?.results.find(
-                                  (r) => r.fileAId === file.id || r.fileBId === file.id
+                                  (r) =>
+                                    r.fileAId === file.id ||
+                                    r.fileBId === file.id,
                                 );
-                                if (!firstPair) return <span className="text-muted-soft text-xs">-</span>;
-                                const otherId = firstPair.fileAId === file.id ? firstPair.fileBId : firstPair.fileAId;
+                                if (!firstPair)
+                                  return (
+                                    <span className="text-muted-soft text-xs">
+                                      -
+                                    </span>
+                                  );
+                                const otherId =
+                                  firstPair.fileAId === file.id
+                                    ? firstPair.fileBId
+                                    : firstPair.fileAId;
                                 return (
                                   <Link
                                     href={`/detail/${file.id}/${otherId}`}
@@ -500,61 +774,140 @@ export default function Home() {
               </div>
             </section>
 
-            <section id="graph" className="scroll-mt-24">
-              <h2 className="text-lg font-display mb-4 text-ink flex items-center gap-2">
-                <GitGraph className="w-5 h-5 text-primary" />
-                Graph Kemiripan
-              </h2>
-              <div className="bg-canvas-card rounded-xl border border-hairline p-4">
-                <p className="text-xs text-muted mb-3">
-                  Node = file, Edge = pasangan dengan similarity &gt;= {filterThreshold || warning}%
-                </p>
-                <GraphVisualization nodes={graphData?.nodes || []} edges={graphData?.edges || []} />
-              </div>
-            </section>
-
             <section id="pairs" className="scroll-mt-24">
               <h2 className="text-lg font-display mb-4 text-ink flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
                 Daftar Pasangan ({sortedResults.length})
               </h2>
               <div className="space-y-2">
-                {sortedResults.map((result: SimilarityResult, i: number) => {
-                  const status = getStatusBadge(result.normalScore);
-                  return (
-                    <Link
-                      key={i}
-                      href={`/detail/${result.fileAId}/${result.fileBId}`}
-                      className="block p-4 bg-canvas-card rounded-xl border border-hairline hover:border-primary/30 hover:shadow-sm transition-all"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-ink truncate">
-                            {result.fileAName} ↔ {result.fileBName}
-                          </p>
-                          <div className="flex gap-4 mt-1.5">
-                            <span className="text-xs text-muted">
-                              Strict: <span className={getScoreColor(result.strictScore)}>{result.strictScore}%</span>
-                            </span>
-                            <span className="text-xs text-muted">
-                              Overlap: <span className={getScoreColor(result.wordOverlap)}>{result.wordOverlap}%</span>
-                            </span>
+                <div className="grid gap-3 md:hidden">
+                  {sortedResults.map((result: SimilarityResult, i: number) => {
+                    const status = getStatusBadge(result.normalScore);
+                    return (
+                      <Link
+                        key={i}
+                        href={`/detail/${result.fileAId}/${result.fileBId}`}
+                        className="block rounded-xl border border-hairline bg-canvas-card p-4 transition-all hover:border-primary/30 hover:shadow-sm"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-xs text-muted">
+                              Pasangan #{i + 1}
+                            </p>
+                            <p className="mt-1 truncate text-sm font-medium text-ink">
+                              {result.fileAName}
+                            </p>
+                            <p className="truncate text-sm text-muted">
+                              {result.fileBName}
+                            </p>
                           </div>
-                        </div>
-                        <div className="text-right ml-4 flex items-center gap-3">
-                          <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${status.bg}`}>
-                            {status.label}
-                          </span>
-                          <div className={`inline-flex items-center justify-center w-16 h-10 rounded-lg ${getScoreBg(result.normalScore)}`}>
-                            <p className={`text-lg font-display font-semibold ${getScoreColor(result.normalScore)}`}>
+                          <div
+                            className={`rounded-lg px-3 py-2 text-right ${getScoreBg(result.normalScore)}`}
+                          >
+                            <p className="text-[11px] uppercase tracking-wide text-muted">
+                              Normal
+                            </p>
+                            <p
+                              className={`text-lg font-display font-semibold ${getScoreColor(result.normalScore)}`}
+                            >
                               {result.normalScore}%
                             </p>
                           </div>
                         </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <span
+                            className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${status.bg}`}
+                          >
+                            {status.label}
+                          </span>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                          <div className="rounded-lg bg-canvas px-3 py-2">
+                            <p className="text-[11px] uppercase tracking-wide text-muted">
+                              Strict
+                            </p>
+                            <p
+                              className={`mt-1 font-medium ${getScoreColor(result.strictScore)}`}
+                            >
+                              {result.strictScore}%
+                            </p>
+                          </div>
+                          <div className="rounded-lg bg-canvas px-3 py-2">
+                            <p className="text-[11px] uppercase tracking-wide text-muted">
+                              Overlap
+                            </p>
+                            <p
+                              className={`mt-1 font-medium ${getScoreColor(result.wordOverlap)}`}
+                            >
+                              {result.wordOverlap}%
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 inline-flex rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
+                          Buka Perbandingan
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                <div className="hidden space-y-2 md:block">
+                  {sortedResults.map((result: SimilarityResult, i: number) => {
+                    const status = getStatusBadge(result.normalScore);
+                    return (
+                      <Link
+                        key={i}
+                        href={`/detail/${result.fileAId}/${result.fileBId}`}
+                        className="block p-4 bg-canvas-card rounded-xl border border-hairline hover:border-primary/30 hover:shadow-sm transition-all"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-ink truncate">
+                              {result.fileAName} ↔ {result.fileBName}
+                            </p>
+                            <div className="flex gap-4 mt-1.5">
+                              <span className="text-xs text-muted">
+                                Strict:{" "}
+                                <span
+                                  className={getScoreColor(result.strictScore)}
+                                >
+                                  {result.strictScore}%
+                                </span>
+                              </span>
+                              <span className="text-xs text-muted">
+                                Overlap:{" "}
+                                <span
+                                  className={getScoreColor(result.wordOverlap)}
+                                >
+                                  {result.wordOverlap}%
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right ml-4 flex items-center gap-3">
+                            <span
+                              className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${status.bg}`}
+                            >
+                              {status.label}
+                            </span>
+                            <div
+                              className={`inline-flex items-center justify-center w-16 h-10 rounded-lg ${getScoreBg(result.normalScore)}`}
+                            >
+                              <p
+                                className={`text-lg font-display font-semibold ${getScoreColor(result.normalScore)}`}
+                              >
+                                {result.normalScore}%
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             </section>
           </>
@@ -564,55 +917,35 @@ export default function Home() {
   );
 }
 
-function GraphVisualization({ nodes, edges }: { nodes: GraphNode[]; edges: GraphEdge[] }) {
-  if (nodes.length === 0) {
-    return <p className="text-center text-muted py-8">Tidak ada data graph</p>;
-  }
+function getCompleteRanking(files: ParsedFile[], ranking: FileRanking[]) {
+  const rankingById = new Map(ranking.map((item) => [item.id, item]));
+  const fileOrder = new Map(files.map((file, index) => [file.id, index]));
 
-  const getEdgeColor = (score: number) => {
-    if (score >= 80) return "#c64545";
-    if (score >= 60) return "#d4a017";
-    return "#5db872";
-  };
+  return files
+    .map((file) => {
+      const ranked = rankingById.get(file.id);
+      if (ranked) return ranked;
 
-  const graphData = {
-    nodes: nodes.map((n) => ({ ...n, val: 5 })),
-    links: edges.map((e) => ({
-      ...e,
-      color: getEdgeColor(e.score),
-      label: e.label,
-    })),
-  };
-
-  return (
-    <div className="w-full h-[500px] bg-canvas rounded-lg">
-      <ForceGraph2D
-        graphData={graphData}
-        nodeLabel="fullName"
-        nodeRelSize={6}
-        nodeColor={() => "#cc785c"}
-        nodeCanvasObject={(node: any, ctx: any, globalScale: number) => {
-          const label = (node as any).name;
-          const fontSize = 12 / globalScale;
-          ctx.font = `${fontSize}px sans-serif`;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = "#141413";
-          ctx.fillText(label as string, (node as any).x, (node as any).y + 18);
-        }}
-        linkColor={(link: any) => link.color}
-        linkWidth={(link: any) => {
-          const score = parseFloat(link.label);
-          return score >= 80 ? 3 : score >= 60 ? 2 : 1.5;
-        }}
-        linkLabel={(link: any) => `${link.label} similarity`}
-        linkDirectionalParticles={2}
-        linkDirectionalParticleWidth={2}
-        linkDirectionalParticleSpeed={0.005}
-        backgroundColor="#faf9f5"
-        width={800}
-        height={500}
-      />
-    </div>
-  );
+      return {
+        id: file.id,
+        name: file.name,
+        maxSimilarity: 0,
+        avgSimilarity: 0,
+        pairCount: 0,
+        metadataStatus: "Aman",
+        metadataReason: "Belum ada pasangan pembanding",
+        lastModifiedBy:
+          file.metadata.lastSavedBy || file.metadata.lastModifiedBy || "-",
+        author:
+          file.metadata.author ||
+          file.metadata.creator ||
+          file.metadata.authors ||
+          "-",
+      } satisfies FileRanking;
+    })
+    .sort((a, b) => {
+      if (b.maxSimilarity !== a.maxSimilarity)
+        return b.maxSimilarity - a.maxSimilarity;
+      return (fileOrder.get(a.id) || 0) - (fileOrder.get(b.id) || 0);
+    });
 }

@@ -2,13 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getResults, getRanking, exportPDF, type SimilarityResult, type ParsedFile, type Settings, type FileRanking } from "@/lib/api";
-import { useAppStore } from "@/lib/store";
 import { FileDown, ArrowLeft, ArrowUpDown, Filter, FileText, AlertTriangle, CheckCircle, ChevronUp, BarChart3, Users } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 
 export default function ResultsPage() {
-  const { setResults } = useAppStore();
   const [sortBy, setSortBy] = useState<"normal" | "strict" | "overlap">("normal");
   const [filterThreshold, setFilterThreshold] = useState(0);
   const [showFloating, setShowFloating] = useState(true);
@@ -23,12 +21,6 @@ export default function ResultsPage() {
     queryFn: getRanking,
     enabled: !!data && data.results.length > 0,
   });
-
-  useEffect(() => {
-    if (data?.results) {
-      setResults(data.results);
-    }
-  }, [data, setResults]);
 
   const sortedResults: SimilarityResult[] = [...(data?.results || [])].sort((a, b) => {
     if (sortBy === "normal") return b.normalScore - a.normalScore;
@@ -95,7 +87,7 @@ export default function ResultsPage() {
     ? Math.round((data.results.reduce((sum, r) => sum + r.normalScore, 0) / data.results.length) * 100) / 100
     : 0;
 
-  const ranking = rankingData?.ranking || [];
+  const ranking = getCompleteRanking(data.files, rankingData?.ranking || []);
 
   return (
     <div className="flex-1 flex flex-col bg-canvas">
@@ -221,7 +213,7 @@ export default function ResultsPage() {
         <section id="ranking" className="scroll-mt-24">
           <h2 className="text-lg font-display mb-4 text-ink flex items-center gap-2">
             <FileText className="w-5 h-5 text-primary" />
-            Ranking per File
+            Ranking per File ({ranking.length}/{totalFiles})
           </h2>
           {rankingLoading ? (
             <div className="bg-canvas-card rounded-xl p-8 text-center text-muted">Memuat ranking...</div>
@@ -229,7 +221,85 @@ export default function ResultsPage() {
             <div className="bg-canvas-card rounded-xl p-8 text-center text-muted">Tidak ada data ranking</div>
           ) : (
             <div className="bg-canvas-card rounded-xl border border-hairline overflow-hidden">
-              <div className="overflow-x-auto">
+              <div className="border-b border-hairline bg-canvas px-4 py-3 text-xs text-muted">
+                Semua file ditampilkan pada ranking, termasuk file dengan similarity 0%.
+              </div>
+              <div className="grid gap-3 p-3 md:hidden">
+                {ranking.map((file: FileRanking, idx: number) => {
+                  const status = getStatusBadge(file.maxSimilarity);
+                  const firstPair = data?.results.find(
+                    (r) => r.fileAId === file.id || r.fileBId === file.id
+                  );
+                  const otherId = firstPair
+                    ? firstPair.fileAId === file.id
+                      ? firstPair.fileBId
+                      : firstPair.fileAId
+                    : null;
+
+                  return (
+                    <div key={file.id} className="rounded-xl border border-hairline bg-canvas p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted">#{idx + 1}</p>
+                          <p className="mt-1 truncate text-sm font-medium text-ink" title={file.name}>{file.name}</p>
+                        </div>
+                        <div className={`rounded-lg px-3 py-2 text-right ${getScoreBg(file.maxSimilarity)}`}>
+                          <p className="text-[11px] uppercase tracking-wide text-muted">Similarity</p>
+                          <p className={`text-lg font-display font-semibold ${getScoreColor(file.maxSimilarity)}`}>
+                            {file.maxSimilarity}%
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${status.bg}`}>
+                          {status.label}
+                        </span>
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+                          file.metadataStatus === "Mencurigakan" ? "bg-error/10 text-error" : "bg-success/10 text-success"
+                        }`}>
+                          {file.metadataStatus === "Mencurigakan" ? (
+                            <AlertTriangle className="w-3 h-3" />
+                          ) : (
+                            <CheckCircle className="w-3 h-3" />
+                          )}
+                          {file.metadataStatus}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="rounded-lg bg-canvas-card px-3 py-2">
+                          <p className="text-[11px] uppercase tracking-wide text-muted">Rata-rata</p>
+                          <p className="mt-1 font-medium text-ink">{file.avgSimilarity}%</p>
+                        </div>
+                        <div className="rounded-lg bg-canvas-card px-3 py-2">
+                          <p className="text-[11px] uppercase tracking-wide text-muted">Jumlah Pair</p>
+                          <p className="mt-1 font-medium text-ink">{file.pairCount}</p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-lg bg-canvas-card px-3 py-2 text-sm">
+                        <p className="text-[11px] uppercase tracking-wide text-muted">Last Modified By</p>
+                        <p className="mt-1 truncate text-ink">{file.lastModifiedBy}</p>
+                      </div>
+
+                      {otherId ? (
+                        <Link
+                          href={`/detail/${file.id}/${otherId}`}
+                          className="inline-flex items-center justify-center rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                        >
+                          Buka Detail
+                        </Link>
+                      ) : (
+                        <span className="inline-flex rounded-lg bg-canvas-card px-3 py-2 text-xs text-muted">
+                          Belum ada pasangan
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="hidden overflow-x-auto md:block">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-canvas-soft border-b border-hairline">
@@ -314,6 +384,55 @@ export default function ResultsPage() {
             Daftar Pasangan ({sortedResults.length})
           </h2>
           <div className="space-y-2">
+            <div className="grid gap-3 md:hidden">
+              {sortedResults.map((result: SimilarityResult, i: number) => {
+                const status = getStatusBadge(result.normalScore);
+                return (
+                  <Link
+                    key={i}
+                    href={`/detail/${result.fileAId}/${result.fileBId}`}
+                    className="block rounded-xl border border-hairline bg-canvas-card p-4 transition-all hover:border-primary/30 hover:shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-xs text-muted">Pasangan #{i + 1}</p>
+                        <p className="mt-1 truncate text-sm font-medium text-ink">{result.fileAName}</p>
+                        <p className="truncate text-sm text-muted">{result.fileBName}</p>
+                      </div>
+                      <div className={`rounded-lg px-3 py-2 text-right ${getScoreBg(result.normalScore)}`}>
+                        <p className="text-[11px] uppercase tracking-wide text-muted">Normal</p>
+                        <p className={`text-lg font-display font-semibold ${getScoreColor(result.normalScore)}`}>
+                          {result.normalScore}%
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${status.bg}`}>
+                        {status.label}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                      <div className="rounded-lg bg-canvas px-3 py-2">
+                        <p className="text-[11px] uppercase tracking-wide text-muted">Strict</p>
+                        <p className={`mt-1 font-medium ${getScoreColor(result.strictScore)}`}>{result.strictScore}%</p>
+                      </div>
+                      <div className="rounded-lg bg-canvas px-3 py-2">
+                        <p className="text-[11px] uppercase tracking-wide text-muted">Overlap</p>
+                        <p className={`mt-1 font-medium ${getScoreColor(result.wordOverlap)}`}>{result.wordOverlap}%</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 inline-flex rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
+                      Buka Perbandingan
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="hidden space-y-2 md:block">
             {sortedResults.map((result: SimilarityResult, i: number) => {
               const status = getStatusBadge(result.normalScore);
               return (
@@ -350,9 +469,37 @@ export default function ResultsPage() {
                 </Link>
               );
             })}
+            </div>
           </div>
         </section>
       </main>
     </div>
   );
+}
+
+function getCompleteRanking(files: ParsedFile[], ranking: FileRanking[]) {
+  const rankingById = new Map(ranking.map((item) => [item.id, item]));
+  const fileOrder = new Map(files.map((file, index) => [file.id, index]));
+
+  return files
+    .map((file) => {
+      const ranked = rankingById.get(file.id);
+      if (ranked) return ranked;
+
+      return {
+        id: file.id,
+        name: file.name,
+        maxSimilarity: 0,
+        avgSimilarity: 0,
+        pairCount: 0,
+        metadataStatus: "Aman",
+        metadataReason: "Belum ada pasangan pembanding",
+        lastModifiedBy: file.metadata.lastSavedBy || file.metadata.lastModifiedBy || "-",
+        author: file.metadata.author || file.metadata.creator || file.metadata.authors || "-",
+      } satisfies FileRanking;
+    })
+    .sort((a, b) => {
+      if (b.maxSimilarity !== a.maxSimilarity) return b.maxSimilarity - a.maxSimilarity;
+      return (fileOrder.get(a.id) || 0) - (fileOrder.get(b.id) || 0);
+    });
 }

@@ -1,9 +1,8 @@
 import { create } from "zustand";
-import { ParsedFile, SimilarityResult, Settings } from "./api";
+import { ParsedFile, Settings } from "./api";
 
 interface AppState {
   files: ParsedFile[];
-  results: SimilarityResult[];
   settings: Settings;
   selectedFiles: File[];
   courseName: string;
@@ -12,7 +11,6 @@ interface AppState {
   message: { type: "success" | "error" | "info"; text: string } | null;
 
   setFiles: (files: ParsedFile[]) => void;
-  setResults: (results: SimilarityResult[]) => void;
   setSettings: (settings: Settings) => void;
   setSelectedFiles: (files: File[]) => void;
   addSelectedFiles: (files: File[]) => void;
@@ -26,7 +24,6 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set) => ({
   files: [],
-  results: [],
   settings: {
     thresholdSafe: 30,
     thresholdWarning: 60,
@@ -40,7 +37,6 @@ export const useAppStore = create<AppState>((set) => ({
   message: null,
 
   setFiles: (files) => set({ files }),
-  setResults: (results) => set({ results }),
   setSettings: (settings) => set({ settings }),
   setSelectedFiles: (files) => set({ selectedFiles: files }),
   addSelectedFiles: (files) =>
@@ -56,7 +52,6 @@ export const useAppStore = create<AppState>((set) => ({
   clearAll: () =>
     set({
       files: [],
-      results: [],
       selectedFiles: [],
       courseName: "",
       message: null,

@@ -151,30 +151,6 @@ app.get("/api/ranking", (c) => {
   return c.json({ ranking: getFileRanking(state.files, state.results) });
 });
 
-app.get("/api/graph", (c) => {
-  const threshold = parseFloat(c.req.query("threshold") || String(state.settings.thresholdWarning));
-  const nodes = state.files.map((f, i) => {
-    const angle = (2 * Math.PI * i) / state.files.length;
-    const radius = 200;
-    return {
-      id: f.id,
-      name: f.name.length > 20 ? f.name.slice(0, 20) + "..." : f.name,
-      fullName: f.name,
-      x: 400 + radius * Math.cos(angle),
-      y: 300 + radius * Math.sin(angle),
-    };
-  });
-  const edges = state.results
-    .filter((r) => r.normalScore >= threshold)
-    .map((r) => ({
-      source: r.fileAId,
-      target: r.fileBId,
-      score: r.normalScore,
-      label: `${r.normalScore}%`,
-    }));
-  return c.json({ nodes, edges });
-});
-
 app.get("/api/pair/:idA/:idB", (c) => {
   const { idA, idB } = c.req.param();
   const fileA = state.files.find((f) => f.id === idA);

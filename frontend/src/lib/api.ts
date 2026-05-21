@@ -72,26 +72,6 @@ export interface FileRanking {
   author: string;
 }
 
-export interface GraphNode {
-  id: string;
-  name: string;
-  fullName: string;
-  x: number;
-  y: number;
-}
-
-export interface GraphEdge {
-  source: string;
-  target: string;
-  score: number;
-  label: string;
-}
-
-export const getGraph = async (threshold?: number) => {
-  const response = await api.get("/graph", { params: { threshold } });
-  return response.data as { nodes: GraphNode[]; edges: GraphEdge[] };
-};
-
 export const getRanking = async () => {
   const response = await api.get("/ranking");
   return response.data as { ranking: FileRanking[] };
