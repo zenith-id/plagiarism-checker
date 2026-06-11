@@ -4,6 +4,18 @@
 
 ---
 
+### Refactoring
+
+#### Backend Feature-Based Architecture
+
+- **Date:** 2026-06-11
+- **Commits:** `418f66d`, `2e3ebab`, `028983b`, `9315f6c`, `2e1a20f`, `49a2227`, `14e5506`, `8c06ecb`
+- Split backend bootstrap into app, config, and shared layers
+- Split backend features into route, handler, service, repository, schema, and types
+- Remove legacy backend utils after feature-based migration
+
+---
+
 ### Features
 
 #### Frontend Next.js App
