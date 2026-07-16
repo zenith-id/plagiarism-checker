@@ -14,13 +14,15 @@ import {
 } from "@/lib/api";
 import { useAppStore } from "@/lib/store";
 import { uploadSchema } from "@/lib/schemas";
-import { Settings as SettingsIcon, RotateCcw, FileDown, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Settings as SettingsIcon, RotateCcw, FileDown } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { MessageBanner } from "@/components/ui/MessageBanner";
 import { FileUploader, CourseNameInput } from "@/components/features/upload/FileUploader";
+import { UploadActions } from "@/components/features/upload/UploadActions";
 import { SummaryCards } from "@/components/features/results/SummaryCards";
 import { RankingTable } from "@/components/features/results/RankingTable";
 import { PairsList } from "@/components/features/results/PairsList";
@@ -143,50 +145,17 @@ export default function Home() {
       {showFloating && hasResults && <FloatingNav />}
 
       <Container>
-        {message && (
-          <div
-            className={`p-4 rounded-lg flex items-center gap-3 ${
-              message.type === "success"
-                ? "bg-success/10 text-success border border-success/20"
-                : "bg-error/10 text-error border border-error/20"
-            }`}
-          >
-            {message.type === "success" ? (
-              <CheckCircle className="w-5 h-5 shrink-0" />
-            ) : (
-              <AlertCircle className="w-5 h-5 shrink-0" />
-            )}
-            <p className="text-sm">{message.text}</p>
-            <button onClick={() => setMessage(null)} className="ml-auto text-sm underline">
-              Tutup
-            </button>
-          </div>
-        )}
+        <MessageBanner message={message} onClose={() => setMessage(null)} />
 
         <FileUploader />
 
-        <div className="flex flex-wrap gap-3">
-          <Button onClick={handleUpload} disabled={uploadMutation.isPending || selectedFiles.length === 0}>
-            {uploadMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Mengunggah...
-              </>
-            ) : (
-              "Unggah File"
-            )}
-          </Button>
-          <Button variant="secondary" onClick={handleAnalyze} disabled={analyzeMutation.isPending}>
-            {analyzeMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Menganalisis...
-              </>
-            ) : (
-              "Analisis"
-            )}
-          </Button>
-        </div>
+        <UploadActions
+          onUpload={handleUpload}
+          onAnalyze={handleAnalyze}
+          uploadPending={uploadMutation.isPending}
+          analyzePending={analyzeMutation.isPending}
+          canUpload={selectedFiles.length > 0}
+        />
 
         <CourseNameInput />
 
