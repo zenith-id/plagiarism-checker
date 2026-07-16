@@ -1,8 +1,8 @@
 import PDFDocument from "pdfkit";
 import { AppError } from "../../shared/errors/AppError";
 import { getFileRanking } from "../analysis/analysis.service";
-import { getReportState } from "./reports.repository";
-import type { ReportSummary } from "./reports.types";
+import { getReportState } from "./export.repository";
+import type { ReportSummary } from "./export.types";
 
 function drawTable(doc: any, headers: string[], rows: string[][], x: number, y: number, colWidths: number[], rowHeight: number) {
   const headerBg = "#181715";

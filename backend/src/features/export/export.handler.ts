@@ -1,6 +1,6 @@
 import type { Context } from "hono";
-import { exportPdfSchema } from "./reports.schema";
-import { generateAnalysisPdf } from "./reports.service";
+import { exportPdfSchema } from "./export.schema";
+import { generateAnalysisPdf } from "./export.service";
 
 export async function exportPdfHandler(_c: Context) {
   exportPdfSchema.parse({});

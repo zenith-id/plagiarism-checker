@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { exportPdfHandler } from "./reports.handler";
+import { exportPdfHandler } from "./export.handler";
 
 export function createReportsRoutes() {
   const app = new Hono();
