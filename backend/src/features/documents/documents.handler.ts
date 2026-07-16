@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { AppError } from "../../shared/errors/AppError";
-import { uploadFileSchema } from "./files.schema";
-import { resetFiles, uploadFiles } from "./files.service";
+import { uploadFileSchema } from "./documents.schema";
+import { resetFiles, uploadFiles } from "./documents.service";
 
 export async function uploadFilesHandler(c: Context) {
   const formData = await c.req.formData();

@@ -1,9 +1,9 @@
 import { AppError } from "../../shared/errors/AppError";
 import { MAX_FILE_SIZE, MAX_FILES } from "../../shared/state/app-state";
 import { successResponse } from "../../shared/utils/response";
-import { appendFiles, clearStoredFiles } from "./files.repository";
-import { parseFile, type ParsedFile } from "./files.parser";
-import type { UploadFilesResult } from "./files.types";
+import { appendFiles, clearStoredFiles } from "./documents.repository";
+import { parseFile, type ParsedFile } from "./documents.parser";
+import type { UploadFilesResult } from "./documents.types";
 
 const ALLOWED_EXTENSIONS = ["txt", "docx", "pdf"];
 

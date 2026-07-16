@@ -1,5 +1,5 @@
 import { state } from "../../shared/state/app-state";
-import type { ParsedFile } from "./files.parser";
+import type { ParsedFile } from "./documents.parser";
 
 export function appendFiles(files: ParsedFile[]) {
   state.files = [...state.files, ...files];

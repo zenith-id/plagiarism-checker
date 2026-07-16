@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { resetFilesHandler, uploadFilesHandler } from "./files.handler";
+import { resetFilesHandler, uploadFilesHandler } from "./documents.handler";
 
 export function createFilesRoutes() {
   const app = new Hono();
