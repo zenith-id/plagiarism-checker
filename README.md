@@ -57,55 +57,108 @@ Setiap file memiliki **2 level pengecekan status**:
 
 ---
 
+## Arsitektur Sistem
+
+```mermaid
+flowchart TB
+    subgraph Client["Browser"]
+        FE["Next.js App<br/>Port 3000"]
+    end
+
+    subgraph API["Backend — Hono.js (Port 3002)"]
+        direction TB
+        GW["app.ts<br/>CORS + Error Handler"]
+        
+        subgraph Modules["Feature Modules"]
+            DOC["features/documents/<br/>upload + parsing"]
+            ANL["features/analysis/<br/>orchestrator"]
+            SET["features/settings/<br/>threshold + exclusions"]
+            EXP["features/export/<br/>PDF report"]
+            HTH["features/health/<br/>health check"]
+        end
+
+        subgraph Core["Core Engine (lib/)"]
+            ALG["algorithms/<br/>tf-idf, n-gram, lcs"]
+            PAR["parsers/<br/>pdf, docx, ocr"]
+            TXT["text-utils/<br/>cleaner"]
+        end
+
+        subgraph Shared["Shared Layer"]
+            ST["state/<br/>in-memory storage"]
+            ERR["errors/<br/>AppError handler"]
+            MID["middleware/<br/>request ID"]
+            UT["utils/<br/>response helper"]
+        end
+
+        GW --> Modules
+        ANL --> ALG
+        ANL --> TXT
+        DOC --> PAR
+        Modules --> ST
+        Modules --> ERR
+    end
+
+    subgraph Files["File Storage"]
+        FI["assets/files/<br/>fixture test files"]
+    end
+
+    FE <--> |"HTTP API<br/>fetch/axios"| GW
+    PAR -.-> |"read"| FI
+```
+
 ## Struktur Folder
 
 ```
 plagiarism-checker/
-├── .env                          # Environment variables (root)
-── .env.example                  # Template environment variables
-── package.json                  # Workspace root + concurrently script
+├── .env.example                  # Template environment variables
+├── package.json                  # Workspace root + scripts
 ├── bun.lock                      # Lockfile workspace
-── README.md                     # Dokumentasi utama
-── AGENTS.md                     # Panduan pengembang
-├── PRD.md                        # Product Requirements Document
-├── DESIGN.md                     # Design system guidelines
+├── README.md                     # Dokumentasi utama
+├── AGENTS.md                     # Panduan pengembang AI
+├── .husky/                       # Git hooks (pre-commit, commit-msg)
+├── commitlint.config.cjs         # Commit message lint rules
 │
 ├── backend/                      # Hono.js API Server
-│   ├── .env                      # Backend env (BACKEND_PORT)
-│   ├── .env.example
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── src/
-│       ├── index.ts              # Entry point + semua endpoint API
-│       └── utils/
-│           ├── parser.ts         # Parser file (TXT, DOCX, PDF + OCR)
-│           ├── similarity.ts     # Algoritma TF-IDF, Cosine, N-Gram, LCS
-│           └── declarations.d.ts # Type declarations untuk library tanpa types
+│   ├── .env / .env.example
+│   ├── package.json / tsconfig.json
+│   ├── src/
+│   │   ├── index.ts              # Entry point (re-export app)
+│   │   ├── app.ts                # Hono setup, CORS, error handler, routes
+│   │   ├── lib/                  # CORE ENGINE — pure logic
+│   │   │   ├── algorithms/       # tf-idf, n-gram, lcs
+│   │   │   ├── parsers/          # pdf, docx, txt, ocr
+│   │   │   └── text-utils/       # text cleaner (normal/strict)
+│   │   ├── features/             # API LAYER — feature modules
+│   │   │   ├── analysis/         # similarity orchestration
+│   │   │   ├── documents/        # upload + file parsing
+│   │   │   ├── export/           # PDF report generation
+│   │   │   ├── health/           # health check endpoint
+│   │   │   └── settings/         # threshold + course exclusions
+│   │   ├── shared/               # cross-cutting concerns
+│   │   │   ├── errors/           # AppError + HTTP error handler
+│   │   │   ├── middleware/       # request ID middleware
+│   │   │   ├── state/            # in-memory app state
+│   │   │   ├── types/            # type declarations
+│   │   │   └── utils/            # logger, response helpers
+│   │   └── db/                   # optional SQLite stub
+│   └── tests/                    # fixture-based integration tests
+│       ├── fixtures.ts           # helper: baca file dari assets/
+│       ├── parser.test.ts        # test parser dengan file nyata
+│       └── analysis-pipeline.test.ts  # end-to-end pipeline test
 │
 ── frontend/                     # Next.js Web App
-│   ├── .env                      # Frontend env (FRONTEND_PORT, API_URL)
-│   ├── .env.example
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── next.config.ts
-│   ├── postcss.config.mjs
+│   ├── .env / .env.example
+│   ├── package.json / tsconfig.json / next.config.ts
 │   └── src/
-│       ├── components/
-│       │   └── Providers.tsx     # TanStack Query provider
-│       └── lib/
-│           ├── api.ts            # API client (axios) + type definitions
-│           ├── schemas.ts        # Zod schemas untuk form validation
-│           └── store.ts          # Zustand global state management
-│   └── app/
-│       ├── layout.tsx            # Root layout + font + Providers
-│       ├── globals.css           # Tailwind + design system tokens
-│       ├── page.tsx              # Halaman utama (upload + summary + ranking + graph + pasangan)
-│       ├── settings/
-│       │   └── page.tsx          # Halaman pengaturan threshold + pengecualian
-│       └── detail/
-│           └── [idA]/
-│               └── [idB]/
-│                   └── page.tsx  # Halaman detail perbandingan pair
+│       ├── components/           # UI components
+│       ├── lib/                  # api client, schemas, store
+│       └── app/                  # Next.js App Router pages
+│           ├── page.tsx          # Dashboard utama
+│           ├── settings/         # Settings page
+│           └── detail/[idA]/[idB]/  # Pair comparison detail
+│
+└── assets/
+    └── files/                    # Fixture file untuk integration test
 ```
 
 ---
