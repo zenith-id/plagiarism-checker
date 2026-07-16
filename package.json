@@ -8,9 +8,20 @@
   "scripts": {
     "dev:be": "cd backend && bun run dev",
     "dev:fe": "cd frontend && bun run dev",
-    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"bgBlue,bgGreen\" \"bun run dev:be\" \"bun run dev:fe\""
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"bgBlue,bgGreen\" \"bun run dev:be\" \"bun run dev:fe\"",
+    "prepare": "husky",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:patch": "standard-version --release-as patch"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
+    "concurrently": "^9.2.1",
+    "husky": "^9.1.7"
+  },
+  "dependencies": {
+    "standard-version": "^9.5.0"
   }
 }
