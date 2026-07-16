@@ -1,6 +1,6 @@
 import { AppError } from "../../shared/errors/AppError";
 import { successResponse } from "../../shared/utils/response";
-import type { ParsedFile } from "../files/files.parser";
+import type { ParsedFile } from "../documents/documents.parser";
 import {
   findAnalysisFileById,
   findAnalysisPairResult,

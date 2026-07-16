@@ -1,4 +1,4 @@
-import type { ParsedFile } from "../files/files.parser";
+import type { ParsedFile } from "../documents/documents.parser";
 import type { SimilarityResult } from "./similarity.service";
 
 export interface RankedFile {

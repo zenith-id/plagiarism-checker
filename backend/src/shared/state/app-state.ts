@@ -1,5 +1,5 @@
 import type { SimilarityResult } from "../../features/analysis/similarity.service";
-import type { ParsedFile } from "../../features/files/files.parser";
+import type { ParsedFile } from "../../features/documents/documents.parser";
 import type { AppSettings } from "../../features/settings/settings.types";
 
 export interface AppState {
