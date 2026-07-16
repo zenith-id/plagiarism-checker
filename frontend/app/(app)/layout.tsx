@@ -44,7 +44,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
-        </Container>
+        </div>
       </header>
       <main className="flex-1 flex flex-col">{children}</main>
     </div>
