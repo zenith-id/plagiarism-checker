@@ -13,67 +13,35 @@ bun test       → Jalankan semua test
 ## Arsitektur Sistem
 
 ```mermaid
-flowchart TB
-    subgraph Client["Client (Next.js Frontend)"]
-        HTTP["HTTP Request (fetch/axios)"]
+flowchart LR
+    FE["Frontend<br/>Next.js :3000"]
+
+    subgraph BE["Backend Hono.js :3002"]
+        APP["app.ts<br/>CORS + Error Handler"]
+
+        subgraph F["Feature Modules"]
+            DOC["documents<br/>upload & parse"]
+            ANL["analysis<br/>orchestrator"]
+            SET["settings<br/>threshold"]
+            EXP["export<br/>PDF report"]
+            HTH["health"]
+        end
+
+        subgraph C["Core Engine (pure logic)"]
+            ALG["algorithms<br/>tf-idf, n-gram, lcs"]
+            PAR["parsers<br/>pdf, docx, ocr"]
+            TXT["text-utils<br/>cleaner"]
+        end
+
+        ST["In-Memory State<br/>(shared/state)"]
     end
 
-    subgraph App["App Layer — app.ts"]
-        CORS["CORS Middleware"]
-        REQID["Request ID Middleware"]
-        ERR["Error Handler (onError)"]
-        ROUTE["Route Registration"]
-    end
-
-    subgraph Features["Feature Modules — features/"]
-        direction TB
-        DOC["documents/<br/>POST /upload<br/>POST /reset"]
-        ANL["analysis/<br/>POST /analyze<br/>GET /results<br/>GET /ranking<br/>GET /pair/:idA/:idB"]
-        SET["settings/<br/>GET /settings<br/>PUT /settings<br/>POST /settings/exclusions"]
-        EXP["export/<br/>GET /export/pdf"]
-        HTH["health/<br/>GET / (health check)"]
-    end
-
-    subgraph Services["Service Layer (orchestrator)"]
-        DOCS["documents.service.ts<br/>- validasi file<br/>- panggil parser<br/>- simpan ke state"]
-        ANLS["analysis.service.ts<br/>- jalankan similarity<br/>- ranking & pair detail<br/>- deteksi arah plagiarisme"]
-        SETS["settings.service.ts<br/>- threshold CRUD<br/>- course exclusions"]
-        EXPS["export.service.ts<br/>- generate PDF report"]
-    end
-
-    subgraph Core["Core Engine — lib/ (pure functions)"]
-        ALG["algorithms/<br/>• tf-idf.ts<br/>• n-gram.ts<br/>• lcs.ts"]
-        PAR["parsers/<br/>• pdf.ts (+ OCR fallback)<br/>• docx.ts (+ metadata)<br/>• ocr.ts (scribe.js-ocr)"]
-        TXT["text-utils/<br/>• cleaner.ts (normal/strict mode)"]
-    end
-
-    subgraph Storage["Storage Layer"]
-        ST["shared/state/app-state.ts<br/>In-Memory Storage"]
-        DB["db/<br/>SQLite stub (optional)"]
-    end
-
-    HTTP --> CORS
-    CORS --> REQID
-    REQID --> ROUTE
-    ROUTE --> Features
-    
-    DOC --> DOCS
-    ANL --> ANLS
-    SET --> SETS
-    EXP --> EXPS
-
-    DOCS -.-> PAR
-    ANLS --> ALG
-    ANLS --> TXT
-    
-    DOCS --> ST
-    ANLS --> ST
-    SETS --> ST
-    EXPS --> ST
-
-    PAR -.-> DB
-    ST -.-> ERR
-    Features -.-> ERR
+    FE -- HTTP --> APP
+    APP --> F
+    ANL --> ALG
+    ANL --> TXT
+    DOC --> PAR
+    F --> ST
 ```
 
 ---
@@ -82,43 +50,43 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    START(["Upload File"]) --> VAL["Validasi<br/>• format (txt/docx/pdf)<br/>• ukuran (max 10MB)<br/>• jumlah (max 200)"]
-    VAL -->|valid| PARSE["Parse File<br/>features/documents/documents.parser.ts"]
-    VAL -->|invalid| ERR["Response Error 400"]
+    UPLOAD(["Upload File"]) --> VAL{"Validasi"}
+    VAL -->|format/ukuran/jumlah| FAIL["Error 400"]
+    VAL -->|OK| PARSE["Parse File<br/>documents.parser.ts"]
 
-    PARSE --> CASE{type file}
-    CASE -->|.txt| TXT["Baca teks langsung<br/>Buffer → UTF-8"]
-    CASE -->|.docx| DOCX["lib/parsers/docx.ts<br/>mammoth → ekstrak teks<br/>xml2js → metadata (author, date, etc)"]
-    CASE -->|.pdf| PDF["lib/parsers/pdf.ts<br/>pdf-parse → ekstrak teks"]
-    PDF -->|content kosong?| OCR["lib/parsers/ocr.ts<br/>scribe.js-ocr → OCR scan<br/>(bahasa eng + ind)"]
+    PARSE --> EXT{"Ekstensi"}
+    EXT -->|.txt| TXT["Baca UTF-8"]
+    EXT -->|.docx| DOCX["lib/parsers/docx.ts<br/>mammoth + xml2js"]
+    EXT -->|.pdf| PDF["lib/parsers/pdf.ts<br/>pdf-parse"]
+    PDF -->|tanpa teks| OCR["lib/parsers/ocr.ts<br/>scribe.js-ocr"]
 
-    TXT --> SAVE["Simpan ke state<br/>shared/state/app-state.ts"]
+    TXT --> SAVE[("Simpan ke<br/>In-Memory State")]
     DOCX --> SAVE
     OCR --> SAVE
     PDF -->|ada teks| SAVE
 
     SAVE --> ANALYZE(["POST /api/analyze"])
-
     ANALYZE --> CLEAN["Bersihkan Teks<br/>lib/text-utils/cleaner.ts"]
-    CLEAN --> CLEAN_N["Mode Normal<br/>• lowercase<br/>• hapus whitespace berlebih"]
-    CLEAN --> CLEAN_S["Mode Strict<br/>• hapus header (Nama, NIM, Kelas)<br/>• hapus template (Pendahuluan, dll)<br/>• hapus kata pengecualian"]
 
-    CLEAN_N --> TFIDF["lib/algorithms/tf-idf.ts<br/>• tokenize<br/>• TF-IDF vector<br/>• Cosine Similarity"]
-    CLEAN_N --> NGRAM["lib/algorithms/n-gram.ts<br/>• 5-gram overlap<br/>(Jaccard coefficient)"]
-    CLEAN_S --> TFIDF_S["TF-IDF (Strict)"]
-    CLEAN_S --> NGRAM_S["5-Gram (Strict)"]
-    CLEAN_N --> LCS["lib/algorithms/lcs.ts<br/>• Word overlap<br/>• Matched ranges"]
+    CLEAN --> CN["Mode Normal<br/>lowercase, trim"]
+    CLEAN --> CS["Mode Strict<br/>hapus header + template"]
 
-    TFIDF --> SCORE_N["Normal Score<br/>= Cosine × 0.7 + NGram × 0.3"]
-    NGRAM --> SCORE_N
-    TFIDF_S --> SCORE_S["Strict Score<br/>= Cosine × 0.7 + NGram × 0.3"]
-    NGRAM_S --> SCORE_S
+    CN --> TF["TF-IDF + Cosine<br/>lib/algorithms/tf-idf.ts"]
+    CN --> NG["5-Gram Overlap<br/>lib/algorithms/n-gram.ts"]
+    CN --> LCS["LCS Word Overlap<br/>lib/algorithms/lcs.ts"]
+    CS --> TFS["TF-IDF (Strict)"]
+    CS --> NGS["5-Gram (Strict)"]
 
-    SCORE_N --> DIRECTION["Deteksi Arah Plagiarisme<br/>• bandingkan panjang dokumen<br/>• bandingkan metadata tanggal"]
-    LCS --> DIRECTION
+    TF --> NR["Normal Score<br/>Cosine×0.7 + NGram×0.3"]
+    NG --> NR
+    TFS --> SR["Strict Score<br/>Cosine×0.7 + NGram×0.3"]
+    NGS --> SR
 
-    DIRECTION --> RESULT["Simpan Hasil<br/>features/analysis/analysis.repository.ts"]
-    RESULT --> VIEW(["Tampilkan ke User<br/>• Ranking<br/>• Pasangan<br/>• Graph<br/>• Detail Pair"])
+    NR --> DIR["Deteksi Arah<br/>panjang + tanggal"]
+    LCS --> DIR
+
+    DIR --> RESULT[("Simpan Hasil")]
+    RESULT --> VIEW(["Ranking | Pair Detail | Graph | Export PDF"])
 ```
 
 ---

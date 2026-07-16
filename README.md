@@ -60,50 +60,37 @@ Setiap file memiliki **2 level pengecekan status**:
 ## Arsitektur Sistem
 
 ```mermaid
-flowchart TB
-    subgraph Client["Browser"]
-        FE["Next.js App<br/>Port 3000"]
-    end
+flowchart LR
+    FE["Frontend<br/>Next.js :3000"]
 
-    subgraph API["Backend — Hono.js (Port 3002)"]
-        direction TB
-        GW["app.ts<br/>CORS + Error Handler"]
-        
-        subgraph Modules["Feature Modules"]
-            DOC["features/documents/<br/>upload + parsing"]
-            ANL["features/analysis/<br/>orchestrator"]
-            SET["features/settings/<br/>threshold + exclusions"]
-            EXP["features/export/<br/>PDF report"]
-            HTH["features/health/<br/>health check"]
+    subgraph BE["Backend Hono.js :3002"]
+        APP["app.ts<br/>CORS, Error Handler"]
+        GW["Route Gateway"]
+
+        subgraph M["Feature Modules"]
+            DOC["documents<br/>(upload, parse)"]
+            ANL["analysis<br/>(orchestrator)"]
+            SET["settings<br/>(threshold)"]
+            EXP["export<br/>(PDF laporan)"]
+            HTH["health"]
         end
 
-        subgraph Core["Core Engine (lib/)"]
-            ALG["algorithms/<br/>tf-idf, n-gram, lcs"]
-            PAR["parsers/<br/>pdf, docx, ocr"]
-            TXT["text-utils/<br/>cleaner"]
+        subgraph C["Core Engine (lib)"]
+            ALG["algorithms<br/>tf-idf, n-gram, lcs"]
+            PAR["parsers<br/>pdf, docx, ocr"]
+            TXT["text-utils<br/>cleaner"]
         end
 
-        subgraph Shared["Shared Layer"]
-            ST["state/<br/>in-memory storage"]
-            ERR["errors/<br/>AppError handler"]
-            MID["middleware/<br/>request ID"]
-            UT["utils/<br/>response helper"]
-        end
-
-        GW --> Modules
-        ANL --> ALG
-        ANL --> TXT
-        DOC --> PAR
-        Modules --> ST
-        Modules --> ERR
+        ST["shared/state<br/>in-memory"]
     end
 
-    subgraph Files["File Storage"]
-        FI["assets/files/<br/>fixture test files"]
-    end
-
-    FE <--> |"HTTP API<br/>fetch/axios"| GW
-    PAR -.-> |"read"| FI
+    FE -- HTTP --> APP
+    APP --> GW
+    GW --> M
+    ANL --> ALG
+    ANL --> TXT
+    DOC --> PAR
+    M --> ST
 ```
 
 ## Struktur Folder
