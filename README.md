@@ -59,32 +59,29 @@ Setiap file memiliki **2 level pengecekan status**:
 
 ## Arsitektur Sistem
 
+### Diagram Backend (Hono.js :3002)
+
 ```mermaid
-flowchart LR
-    FE["Frontend<br/>Next.js :3000"]
+flowchart TD
+    APP["app.ts<br/>CORS, Error Handler"]
+    GW["Route Gateway"]
 
-    subgraph BE["Backend Hono.js :3002"]
-        APP["app.ts<br/>CORS, Error Handler"]
-        GW["Route Gateway"]
-
-        subgraph M["Feature Modules"]
-            DOC["documents<br/>(upload, parse)"]
-            ANL["analysis<br/>(orchestrator)"]
-            SET["settings<br/>(threshold)"]
-            EXP["export<br/>(PDF laporan)"]
-            HTH["health"]
-        end
-
-        subgraph C["Core Engine (lib)"]
-            ALG["algorithms<br/>tf-idf, n-gram, lcs"]
-            PAR["parsers<br/>pdf, docx, ocr"]
-            TXT["text-utils<br/>cleaner"]
-        end
-
-        ST["shared/state<br/>in-memory"]
+    subgraph M["Feature Modules"]
+        DOC["documents<br/>(upload, parse)"]
+        ANL["analysis<br/>(orchestrator)"]
+        SET["settings<br/>(threshold)"]
+        EXP["export<br/>(PDF laporan)"]
+        HTH["health"]
     end
 
-    FE -- HTTP --> APP
+    subgraph C["Core Engine (lib)"]
+        ALG["algorithms<br/>tf-idf, n-gram, lcs"]
+        PAR["parsers<br/>pdf, docx, ocr"]
+        TXT["text-utils<br/>cleaner"]
+    end
+
+    ST["shared/state<br/>in-memory"]
+
     APP --> GW
     GW --> M
     ANL --> ALG
@@ -92,6 +89,65 @@ flowchart LR
     DOC --> PAR
     M --> ST
 ```
+
+### Diagram Frontend (Next.js :3000)
+
+```mermaid
+flowchart TD
+    PAGE["App Router Pages<br/>(marketing) + (app)/dashboard"]
+
+    subgraph LIB["lib/"]
+        API["api.ts<br/>HTTP client"]
+        STORE["store.ts<br/>Zustand"]
+        SCH["schemas.ts<br/>zod"]
+        UTIL["scoring / ranking / highlight"]
+    end
+
+    subgraph FEAT["components/features/"]
+        UP["upload"]
+        RES["results"]
+        DET["detail"]
+        SET["settings"]
+    end
+
+    UI["components/ui + layout + marketing"]
+
+    PAGE --> FEAT
+    PAGE --> UI
+    FEAT --> LIB
+    LIB --> API
+    STORE --> FEAT
+```
+
+### Diagram Gabungan — Alur BE ⇄ FE
+
+```mermaid
+flowchart LR
+    subgraph FE["Frontend (Next.js :3000)"]
+        U["User / Browser"]
+        FX["React Pages + Features"]
+        FAPI["api.ts (axios)"]
+    end
+
+    subgraph BE["Backend (Hono.js :3002)"]
+        BAPI["app.ts + Gateway"]
+        MOD["Feature Modules<br/>documents / analysis / settings / export"]
+        ENG["Core Engine<br/>algorithms + parsers + cleaner"]
+        ST["in-memory state"]
+    end
+
+    U -->|upload file / klik analisis| FX
+    FX -->|HTTP POST /api/upload| FAPI
+    FAPI -->|HTTP request| BAPI
+    BAPI --> MOD --> ENG --> ST
+    ENG -->|skor similarity| MOD
+    MOD -->|JSON response| BAPI
+    BAPI -->|HTTP response| FAPI
+    FAPI -->|data ke store/UI| FX
+    FX -->|tampil ranking + detail| U
+```
+
+**Alur singkat:** User upload file di FE → FE kirim ke `/api/upload` → BE parse & simpan di memory → FE minta `/api/analyze` → BE hitung similarity (TF-IDF/LCS) → FE tampilkan ranking, graph, dan detail perbandingan.
 
 ## Struktur Folder
 
