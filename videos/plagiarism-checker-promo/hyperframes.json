@@ -1,0 +1,13 @@
+{
+  "project": "plagiarism-checker-promo",
+  "mode": "collaborative",
+  "language": "id",
+  "aspect": "16:9",
+  "width": 1920,
+  "height": 1080,
+  "message": "Cek kemiripan dokumen tugas mahasiswa secara massal, cepat, dan 100% lokal.",
+  "angle": "value-first: privasi lokal + pemrosesan massal sebagai keunggulan utama",
+  "lengthSeconds": 55,
+  "destination": "youtube-embed",
+  "signIn": "offline-local-engines"
+}
