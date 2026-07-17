@@ -1,0 +1,149 @@
+<template>
+  <div id="root" data-composition-id="04-features" data-start="0" data-duration="10.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+    <div class="stage">
+      <div class="kicker" id="kicker"><span class="star">✱</span> Fitur utama</div>
+      <div class="grid" id="grid">
+        <div class="card" id="c1">
+          <div class="icon">◧◧</div>
+          <div class="ct">Pemrosesan massal</div>
+          <div class="cb">Ratusan dokumen sekaligus.</div>
+        </div>
+        <div class="card" id="c2">
+          <div class="icon">∿</div>
+          <div class="ct">Multi-algoritma</div>
+          <div class="cb">TF-IDF, N-Gram, dan LCS.</div>
+        </div>
+        <div class="card" id="c3">
+          <div class="icon">▤</div>
+          <div class="ct">Laporan lengkap</div>
+          <div class="cb">Ekspor PDF siap tinjau.</div>
+        </div>
+        <div class="card" id="c4">
+          <div class="icon">⇆</div>
+          <div class="ct">Ambang batas kustom</div>
+          <div class="cb">Atur sensitivitas sendiri.</div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: radial-gradient(circle, rgba(204,120,92,0.12) 0.5cqw, transparent 0.7cqw);
+        background-size: 6cqw 6cqw;
+        background-position: 0 0;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3cqw;
+        padding: 0 8cqw;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.46cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star { color: #cc785c; margin-right: 0.4cqw; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.4cqw;
+      }
+      .card {
+        width: 34cqw;
+        height: 18cqw;
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        padding: 2.2cqw;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6cqw;
+        will-change: transform, opacity;
+      }
+      .icon {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 2.2cqw;
+        color: #a9583e;
+        margin-bottom: 0.4cqw;
+      }
+      .ct {
+        font-family: Georgia, serif;
+        font-size: 2.3cqw;
+        letter-spacing: -0.005em;
+        color: #141413;
+      }
+      .cb {
+        font-family: Georgia, serif;
+        font-size: 1.5cqw;
+        line-height: 1.5;
+        color: #141413;
+        opacity: 0.82;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["04-features"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo(q("#kicker"),
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
+
+        tl.fromTo(q("#c1"),
+          { scale: 0, opacity: 0, y: 16 },
+          { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.3);
+
+        const rest = ["#c2", "#c3", "#c4"];
+        const dirs = [
+          { x: 0, y: -8 }, { x: -8, y: 8 }, { x: 8, y: 8 }
+        ];
+        rest.forEach((sel, i) => {
+          tl.fromTo(q(sel),
+            { scale: 0, opacity: 0, x: dirs[i].x, y: dirs[i].y },
+            { scale: 1, opacity: 1, x: 0, y: 0, duration: 0.6, ease: "power3.out" },
+            2.7 + i * 0.7);
+        });
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.4,
+          duration: 1.2,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            gsap.set(q("#grid"), { y: y });
+          }
+        }, 4.2);
+
+        window.__timelines["04-features"] = tl;
+      };
+      window.__frameOut["04-features"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, x: -5cqw, duration: 0.45, ease: "power2.in" });
+      };
+    </script>
+  </div>
+</template>

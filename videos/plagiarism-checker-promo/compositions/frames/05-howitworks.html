@@ -1,0 +1,184 @@
+<template>
+  <div id="root" data-composition-id="05-howitworks" data-start="0" data-duration="10.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+    <div class="viewport" id="viewport">
+      <div class="canvas">
+        <div class="kicker" id="kicker"><span class="star">✱</span> Cara kerja</div>
+        <div class="track">
+          <div class="station" id="s1" style="left: 1cqw;">
+            <div class="badge">1</div>
+            <div class="st">Unggah dokumen</div>
+          </div>
+          <svg class="connector" id="conn1" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="path1" d="M 26 50 L 50 50" />
+          </svg>
+          <div class="station" id="s2" style="left: 38cqw;">
+            <div class="badge">2</div>
+            <div class="st">Analisis otomatis</div>
+          </div>
+          <svg class="connector" id="conn2" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="path2" d="M 59 50 L 83 50" />
+          </svg>
+          <div class="station" id="s3" style="left: 75cqw;">
+            <div class="badge">3</div>
+            <div class="st">Tinjau & ekspor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+        overflow: hidden;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: repeating-linear-gradient(115deg, rgba(93,184,166,0.10) 0 0.4cqw, transparent 0.4cqw 4cqw);
+      }
+      .viewport {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        will-change: transform;
+      }
+      .canvas {
+        position: relative;
+        width: 100cqw;
+        height: 44cqw;
+      }
+      .kicker {
+        position: absolute;
+        top: 2cqw;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.46cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star { color: #cc785c; margin-right: 0.4cqw; }
+      .track {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 16cqw;
+        transform: translateY(-50%);
+      }
+      .station {
+        position: absolute;
+        top: 0;
+        width: 24cqw;
+        height: 16cqw;
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        display: flex;
+        align-items: center;
+        gap: 1.4cqw;
+        padding: 0 2cqw;
+        will-change: transform, opacity;
+      }
+      .badge {
+        flex: none;
+        width: 4.4cqw;
+        height: 4.4cqw;
+        border-radius: 9999px;
+        background: #F2E1DB;
+        border: 1px solid rgba(20,20,19,0.12);
+        display: grid;
+        place-items: center;
+        font-family: Georgia, serif;
+        font-size: 2.2cqw;
+        color: #141413;
+      }
+      .st {
+        font-family: Georgia, serif;
+        font-size: 2.1cqw;
+        line-height: 1.2;
+        color: #141413;
+      }
+      .connector {
+        position: absolute;
+        top: 50%;
+        height: 6cqw;
+        width: 13cqw;
+        transform: translateY(-50%);
+        overflow: visible;
+        pointer-events: none;
+      }
+      #conn1 { left: 25cqw; }
+      #conn2 { left: 62cqw; }
+      .connector path {
+        fill: none;
+        stroke: #a9583e;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["05-howitworks"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo(q("#kicker"),
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+
+        tl.fromTo(q("#s1"),
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
+
+        tl.fromTo(q("#s2"),
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 1.6);
+
+        tl.fromTo(q("#s3"),
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 3.0);
+
+        const p1 = q("#path1")[0];
+        const p2 = q("#path2")[0];
+        [p1, p2].forEach((p) => {
+          const len = p.getTotalLength();
+          p.style.strokeDasharray = len;
+          p.style.strokeDashoffset = len;
+        });
+        tl.to(p1, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 1.0);
+        tl.to(p2, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 2.4);
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 0.7,
+          duration: 1.8,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2;
+            gsap.set(q(["#s1", "#s2", "#s3"]), { y: y });
+          }
+        }, 4.2);
+
+        window.__timelines["05-howitworks"] = tl;
+      };
+      window.__frameOut["05-howitworks"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, duration: 0.4, ease: "power2.in" });
+      };
+    </script>
+  </div>
+</template>

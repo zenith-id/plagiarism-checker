@@ -1,0 +1,154 @@
+<template>
+  <div id="root" data-composition-id="02-value" data-start="0" data-duration="9.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="9" data-track-index="0"></div>
+
+    <div class="stage">
+      <div class="kicker" id="kicker"><span class="star">✱</span> Algoritma</div>
+      <div class="caption" id="caption">3 algoritma. 1 proses, sepenuhnya di mesin lokal.</div>
+      <div class="ring">
+        <div class="chip" id="chip1">TF-IDF</div>
+        <div class="chip" id="chip2">N-Gram</div>
+        <div class="chip" id="chip3">LCS</div>
+        <div class="shield" id="shield">100% lokal</div>
+      </div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image:
+          radial-gradient(circle, rgba(93,184,166,0.10) 1.4cqw, transparent 1.6cqw),
+          radial-gradient(circle, rgba(93,184,166,0.07) 3cqw, transparent 3.2cqw),
+          radial-gradient(circle, rgba(93,184,166,0.05) 5cqw, transparent 5.2cqw);
+        background-position: 50% 50%;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        gap: 3cqw;
+      }
+      .ring {
+        position: relative;
+        width: 46cqw;
+        height: 46cqw;
+      }
+      .chip {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 16cqw;
+        height: 9cqw;
+        margin: -4.5cqw 0 0 -8cqw;
+        display: grid;
+        place-items: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.8cqw;
+        letter-spacing: 0.04em;
+        color: #141413;
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        will-change: transform, opacity;
+      }
+      #chip1 { transform: translate(-18cqw, -9cqw); }
+      #chip2 { transform: translate(0cqw, -16cqw); }
+      #chip3 { transform: translate(18cqw, -9cqw); }
+      .shield {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-7.5cqw, -7.5cqw);
+        width: 15cqw;
+        height: 15cqw;
+        border-radius: 9999px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        font-family: Georgia, serif;
+        font-size: 2.1cqw;
+        line-height: 1.1;
+        color: #faf9f5;
+        background: #cc785c;
+        will-change: transform, opacity;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.6cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star {
+        color: #cc785c;
+        margin-right: 0.4cqw;
+      }
+      .caption {
+        font-family: Georgia, serif;
+        font-size: 3cqw;
+        font-weight: 500;
+        line-height: 1.3;
+        color: #141413;
+        text-align: center;
+        max-width: 56cqw;
+        will-change: transform, opacity;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["02-value"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        const chips = ["#chip1", "#chip2", "#chip3"];
+        chips.forEach((sel, i) => {
+          tl.fromTo(q(sel),
+            { scale: 0, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" },
+            0.2 + i * 0.18);
+        });
+
+        tl.to(q(".ring"), { rotation: 6, duration: 3.0, ease: "power1.inOut" }, 2.0);
+        tl.to(q(".ring"), { rotation: 0, duration: 3.5, ease: "power1.inOut" }, 4.5);
+
+        tl.fromTo(q("#shield"),
+          { scale: 0.4, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, 2.2);
+
+        tl.fromTo(q("#caption"),
+          { opacity: 0, y: 18 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 2.8);
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.3,
+          duration: 1.5,
+          ease: "none",
+          onUpdate: () => {
+            const s = 1 + Math.sin(phase.p) * 0.012;
+            gsap.set(q("#shield"), { scale: s });
+          }
+        }, 3.8);
+
+        window.__timelines["02-value"] = tl;
+      };
+      window.__frameOut["02-value"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
+      };
+    </script>
+  </div>
+</template>

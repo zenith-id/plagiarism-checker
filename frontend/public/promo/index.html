@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #faf9f5; }
+      #stage { position: relative; width: 100%; height: 100%; overflow: hidden; background: #faf9f5; }
+      .scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; will-change: opacity, transform; }
+      .scene.is-active { opacity: 1; visibility: visible; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <div class="scene" data-frame="01-hook"  data-start="0"  data-duration="4.5"></div>
+      <div class="scene" data-frame="02-value"  data-start="4.5"  data-duration="5.5"></div>
+      <div class="scene" data-frame="03-stats"  data-start="10"  data-duration="4.5"></div>
+      <div class="scene" data-frame="04-features"  data-start="14.5"  data-duration="5.5"></div>
+      <div class="scene" data-frame="05-howitworks"  data-start="20"  data-duration="5.5"></div>
+      <div class="scene" data-frame="06-cta"  data-start="25.5"  data-duration="4.5"></div>
+    </div>
+
+    <!-- ===== Frame templates (inlined from compositions/frames/*.html) ===== -->
+    <template id="tpl-01-hook"><div id="root" data-composition-id="01-hook" data-start="0" data-duration="8.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="8" data-track-index="0"></div>
+
+    <div class="stage">
+      <div class="kicker" id="kicker"><span class="star">✱</span> Deteksi plagiarisme tugas mahasiswa</div>
+      <h1 class="h1" id="h1">
+        <span class="w">Cek</span> <span class="w">kemiripan</span> <span class="w">dokumen</span>
+        <span class="w">secara</span> <span class="w">massal,</span> <span class="w">cepat,</span>
+        <span class="w">dan</span> <span class="w">lokal.</span>
+      </h1>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+        overflow: hidden;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: radial-gradient(60cqw 60cqw at 50% 42%, rgba(204,120,92,0.16), rgba(204,120,92,0) 70%);
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2cqw;
+        padding: 3cqw 8cqw;
+        text-align: center;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.46cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star {
+        color: #cc785c;
+        margin-right: 0.4cqw;
+      }
+      .h1 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        font-size: 3.2cqw;
+        line-height: 1.12;
+        letter-spacing: -0.018em;
+        color: #141413;
+        max-width: 90cqw;
+        margin: 0;
+      }
+      .h1 .w {
+        display: inline-block;
+        will-change: transform, opacity;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["01-hook"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+        const words = q("#h1 .w");
+
+        tl.fromTo(q("#kicker"),
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+
+        words.forEach((el, i) => {
+          tl.fromTo(el,
+            { opacity: 0, y: 26, scale: 0.96 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" },
+            0.15 + i * 0.16);
+        });
+
+        tl.fromTo(root,
+          { scale: 1.02 },
+          { scale: 1, duration: 4.0, ease: "power2.out" }, 0.15);
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.1,
+          duration: 3.0,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            words.forEach((el) => { el.style.transform = `translateY(${y}px)`; });
+          }
+        }, 4.5);
+
+        window.__timelines["01-hook"] = tl;
+      };
+      window.__frameOut["01-hook"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
+      };
+    </script>
+  </div></template>
+
+    <template id="tpl-02-value"><div id="root" data-composition-id="02-value" data-start="0" data-duration="9.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="9" data-track-index="0"></div>
+
+    <div class="stage">
+      <div class="head">
+        <div class="kicker" id="kicker"><span class="star">✱</span> Algoritma</div>
+        <div class="caption" id="caption">3 algoritma. 1 proses, sepenuhnya di mesin lokal.</div>
+      </div>
+      <div class="ring">
+        <div class="chip" id="chip1">TF-IDF</div>
+        <div class="chip" id="chip2">N-Gram</div>
+        <div class="chip" id="chip3">LCS</div>
+        <div class="shield" id="shield">100% lokal</div>
+      </div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image:
+          radial-gradient(circle, rgba(93,184,166,0.10) 1.4cqw, transparent 1.6cqw),
+          radial-gradient(circle, rgba(93,184,166,0.07) 3cqw, transparent 3.2cqw),
+          radial-gradient(circle, rgba(93,184,166,0.05) 5cqw, transparent 5.2cqw);
+        background-position: 50% 50%;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .head {
+        flex: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.4cqw;
+        padding-top: 7cqw;
+        text-align: center;
+      }
+      .ring {
+        position: relative;
+        flex: 1 1 auto;
+        width: 46cqw;
+      }
+      .chip {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 16cqw;
+        height: 9cqw;
+        margin: -4.5cqw 0 0 -8cqw;
+        display: grid;
+        place-items: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.8cqw;
+        letter-spacing: 0.04em;
+        color: #141413;
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        will-change: transform, opacity;
+      }
+      #chip1 { transform: translate(-18cqw, -9cqw); }
+      #chip2 { transform: translate(0cqw, -16cqw); }
+      #chip3 { transform: translate(18cqw, -9cqw); }
+      .shield {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-7.5cqw, -7.5cqw);
+        width: 15cqw;
+        height: 15cqw;
+        border-radius: 9999px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        font-family: Georgia, serif;
+        font-size: 2.1cqw;
+        line-height: 1.1;
+        color: #faf9f5;
+        background: #cc785c;
+        will-change: transform, opacity;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.6cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star {
+        color: #cc785c;
+        margin-right: 0.4cqw;
+      }
+      .caption {
+        font-family: Georgia, serif;
+        font-size: 3cqw;
+        font-weight: 500;
+        line-height: 1.3;
+        color: #141413;
+        text-align: center;
+        max-width: 56cqw;
+        will-change: transform, opacity;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["02-value"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        const chips = ["#chip1", "#chip2", "#chip3"];
+        chips.forEach((sel, i) => {
+          tl.fromTo(q(sel),
+            { scale: 0, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" },
+            0.2 + i * 0.18);
+        });
+
+        tl.to(q(".ring"), { rotation: 6, duration: 3.0, ease: "power1.inOut" }, 2.0);
+        tl.to(q(".ring"), { rotation: 0, duration: 3.5, ease: "power1.inOut" }, 4.5);
+
+        tl.fromTo(q("#shield"),
+          { scale: 0.4, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, 2.2);
+
+        tl.fromTo(q("#caption"),
+          { opacity: 0, y: 18 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 2.8);
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.3,
+          duration: 1.5,
+          ease: "none",
+          onUpdate: () => {
+            const s = 1 + Math.sin(phase.p) * 0.012;
+            gsap.set(q("#shield"), { scale: s });
+          }
+        }, 3.8);
+
+        window.__timelines["02-value"] = tl;
+      };
+      window.__frameOut["02-value"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
+      };
+    </script>
+  </div></template>
+
+    <template id="tpl-03-stats"><div id="root" data-composition-id="03-stats" data-start="0" data-duration="8.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="8" data-track-index="0"></div>
+
+    <div class="stage">
+      <div class="kicker" id="kicker"><span class="star">✱</span> Statistik</div>
+      <div class="title" id="title">Dalam satu proses</div>
+      <div class="row" id="row">
+        <div class="tile tile-hero">
+          <span class="figure" id="figure">0</span>
+          <span class="unit">file/batch</span>
+        </div>
+        <div class="tile" id="t2"><span class="figure-sm">3</span><span class="unit">algoritma</span></div>
+        <div class="tile" id="t3"><span class="figure-sm">PDF</span><span class="unit">ekspor</span></div>
+        <div class="tile" id="t4"><span class="figure-sm">100%</span><span class="unit">lokal</span></div>
+      </div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image:
+          linear-gradient(rgba(20,20,19,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20,20,19,0.05) 1px, transparent 1px);
+        background-size: 5cqw 5cqw;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        gap: 3cqw;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.6cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+        will-change: transform, opacity;
+      }
+      .kicker .star {
+        color: #cc785c;
+        margin-right: 0.4cqw;
+      }
+      .title {
+        font-family: Georgia, serif;
+        font-size: 3.6cqw;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        color: #141413;
+        will-change: transform, opacity;
+      }
+      .row {
+        display: flex;
+        align-items: stretch;
+        gap: 2.2cqw;
+      }
+      .tile {
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        padding: 3cqw 2.4cqw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8cqw;
+        will-change: transform, opacity;
+      }
+      .tile-hero {
+        background: #faf9f5;
+        padding: 3cqw 3cqw;
+        min-width: 26cqw;
+      }
+      .figure {
+        font-family: Georgia, serif;
+        font-size: 9.4cqw;
+        line-height: 0.95;
+        letter-spacing: -0.025em;
+        color: #141413;
+        display: inline-block;
+        font-variant-numeric: tabular-nums;
+        transform-origin: center center;
+        will-change: transform;
+      }
+      .figure-sm {
+        font-family: Georgia, serif;
+        font-size: 4.6cqw;
+        line-height: 1;
+        color: #141413;
+      }
+      .unit {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.35cqw;
+        letter-spacing: 0.04em;
+        color: #141413;
+        opacity: 0.78;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["03-stats"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo(q("#kicker"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
+        tl.fromTo(q("#title"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.25);
+        tl.fromTo(q("#row"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.4);
+
+        const figure = q("#figure")[0];
+        const counter = { v: 0 };
+        tl.to(counter, {
+          v: 200, duration: 1.6, ease: "power3.out",
+          onUpdate: () => { figure.textContent = Math.round(counter.v); }
+        }, 0.5);
+        tl.fromTo(figure, { scale: 0.5 }, { scale: 1, duration: 1.6, ease: "power3.out" }, 0.5);
+        tl.fromTo(q(".tile-hero .unit"), { opacity: 0 }, { opacity: 0.78, duration: 0.5 }, 1.3);
+
+        const extras = ["#t2", "#t3", "#t4"];
+        extras.forEach((sel, i) => {
+          const dir = i === 0 ? -1 : 1;
+          tl.fromTo(q(sel),
+            { opacity: 0, scale: 0.8, x: dir * 6 },
+            { opacity: 1, scale: 1, x: 0, duration: 0.6, ease: "power3.out" },
+            2.2 + i * 0.3);
+        });
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.2,
+          duration: 1.5,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            gsap.set(q("#row"), { y: y });
+          }
+        }, 2.6);
+
+        window.__timelines["03-stats"] = tl;
+      };
+      window.__frameOut["03-stats"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, x: -96, duration: 0.45, ease: "power2.in" });
+      };
+    </script>
+  </div></template>
+
+    <template id="tpl-04-features"><div id="root" data-composition-id="04-features" data-start="0" data-duration="10.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+    <div class="stage">
+      <div class="kicker" id="kicker"><span class="star">✱</span> Fitur utama</div>
+      <div class="grid" id="grid">
+        <div class="card" id="c1">
+          <div class="icon">◧◧</div>
+          <div class="ct">Pemrosesan massal</div>
+          <div class="cb">Ratusan dokumen sekaligus.</div>
+        </div>
+        <div class="card" id="c2">
+          <div class="icon">∿</div>
+          <div class="ct">Multi-algoritma</div>
+          <div class="cb">TF-IDF, N-Gram, dan LCS.</div>
+        </div>
+        <div class="card" id="c3">
+          <div class="icon">▤</div>
+          <div class="ct">Laporan lengkap</div>
+          <div class="cb">Ekspor PDF siap tinjau.</div>
+        </div>
+        <div class="card" id="c4">
+          <div class="icon">⇆</div>
+          <div class="ct">Ambang batas kustom</div>
+          <div class="cb">Atur sensitivitas sendiri.</div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: radial-gradient(circle, rgba(204,120,92,0.12) 0.5cqw, transparent 0.7cqw);
+        background-size: 6cqw 6cqw;
+        background-position: 0 0;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3cqw;
+        padding: 0 8cqw;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.46cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star { color: #cc785c; margin-right: 0.4cqw; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.4cqw;
+      }
+      .card {
+        width: 34cqw;
+        height: 18cqw;
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        padding: 2.2cqw;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6cqw;
+        will-change: transform, opacity;
+      }
+      .icon {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 2.2cqw;
+        color: #a9583e;
+        margin-bottom: 0.4cqw;
+      }
+      .ct {
+        font-family: Georgia, serif;
+        font-size: 2.3cqw;
+        letter-spacing: -0.005em;
+        color: #141413;
+      }
+      .cb {
+        font-family: Georgia, serif;
+        font-size: 1.5cqw;
+        line-height: 1.5;
+        color: #141413;
+        opacity: 0.82;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["04-features"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo(q("#kicker"),
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
+
+        tl.fromTo(q("#c1"),
+          { scale: 0, opacity: 0, y: 16 },
+          { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.3);
+
+        const rest = ["#c2", "#c3", "#c4"];
+        const dirs = [
+          { x: 0, y: -8 }, { x: -8, y: 8 }, { x: 8, y: 8 }
+        ];
+        rest.forEach((sel, i) => {
+          tl.fromTo(q(sel),
+            { scale: 0, opacity: 0, x: dirs[i].x, y: dirs[i].y },
+            { scale: 1, opacity: 1, x: 0, y: 0, duration: 0.6, ease: "power3.out" },
+            2.7 + i * 0.7);
+        });
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.4,
+          duration: 1.2,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            gsap.set(q("#grid"), { y: y });
+          }
+        }, 4.2);
+
+        window.__timelines["04-features"] = tl;
+      };
+      window.__frameOut["04-features"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, x: -96, duration: 0.45, ease: "power2.in" });
+      };
+    </script>
+  </div></template>
+
+    <template id="tpl-05-howitworks"><div id="root" data-composition-id="05-howitworks" data-start="0" data-duration="10.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+    <div class="viewport" id="viewport">
+      <div class="canvas">
+        <div class="kicker" id="kicker"><span class="star">✱</span> Cara kerja</div>
+        <div class="track">
+          <div class="station" id="s1" style="left: 1cqw;">
+            <div class="badge">1</div>
+            <div class="st">Unggah dokumen</div>
+          </div>
+          <svg class="connector" id="conn1" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="path1" d="M 26 50 L 50 50" />
+          </svg>
+          <div class="station" id="s2" style="left: 38cqw;">
+            <div class="badge">2</div>
+            <div class="st">Analisis otomatis</div>
+          </div>
+          <svg class="connector" id="conn2" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="path2" d="M 59 50 L 83 50" />
+          </svg>
+          <div class="station" id="s3" style="left: 75cqw;">
+            <div class="badge">3</div>
+            <div class="st">Tinjau & ekspor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+        overflow: hidden;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: repeating-linear-gradient(115deg, rgba(93,184,166,0.10) 0 0.4cqw, transparent 0.4cqw 4cqw);
+      }
+      .viewport {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        will-change: transform;
+      }
+      .canvas {
+        position: relative;
+        width: 100cqw;
+        height: 44cqw;
+      }
+      .kicker {
+        position: absolute;
+        top: 2cqw;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.46cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star { color: #cc785c; margin-right: 0.4cqw; }
+      .track {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 16cqw;
+        transform: translateY(-50%);
+      }
+      .station {
+        position: absolute;
+        top: 0;
+        width: 24cqw;
+        height: 16cqw;
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        display: flex;
+        align-items: center;
+        gap: 1.4cqw;
+        padding: 0 2cqw;
+        will-change: transform, opacity;
+      }
+      .badge {
+        flex: none;
+        width: 4.4cqw;
+        height: 4.4cqw;
+        border-radius: 9999px;
+        background: #F2E1DB;
+        border: 1px solid rgba(20,20,19,0.12);
+        display: grid;
+        place-items: center;
+        font-family: Georgia, serif;
+        font-size: 2.2cqw;
+        color: #141413;
+      }
+      .st {
+        font-family: Georgia, serif;
+        font-size: 2.1cqw;
+        line-height: 1.2;
+        color: #141413;
+      }
+      .connector {
+        position: absolute;
+        top: 50%;
+        height: 6cqw;
+        width: 13cqw;
+        transform: translateY(-50%);
+        overflow: visible;
+        pointer-events: none;
+      }
+      #conn1 { left: 25cqw; }
+      #conn2 { left: 62cqw; }
+      .connector path {
+        fill: none;
+        stroke: #a9583e;
+        stroke-width: 2;
+        stroke-linecap: round;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["05-howitworks"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo(q("#kicker"),
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+
+        tl.fromTo(q("#s1"),
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
+
+        tl.fromTo(q("#s2"),
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 1.6);
+
+        tl.fromTo(q("#s3"),
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 3.0);
+
+        const p1 = q("#path1")[0];
+        const p2 = q("#path2")[0];
+        [p1, p2].forEach((p) => {
+          const len = p.getTotalLength();
+          p.style.strokeDasharray = len;
+          p.style.strokeDashoffset = len;
+        });
+        tl.to(p1, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 1.0);
+        tl.to(p2, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 2.4);
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 0.7,
+          duration: 1.8,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2;
+            gsap.set(q(["#s1", "#s2", "#s3"]), { y: y });
+          }
+        }, 4.2);
+
+        window.__timelines["05-howitworks"] = tl;
+      };
+      window.__frameOut["05-howitworks"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, duration: 0.4, ease: "power2.in" });
+      };
+    </script>
+  </div></template>
+
+    <template id="tpl-06-cta"><div id="root" data-composition-id="06-cta" data-start="0" data-duration="10" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+    <div class="stage">
+      <h1 class="h1" id="h1">
+        <span class="w">Siap</span> <span class="w">memeriksa</span> <span class="w">dokumen?</span>
+      </h1>
+      <div class="button" id="button">Buka Aplikasi</div>
+
+      <div class="cursor" id="cursor">
+        <svg width="44" height="44" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 3L19 12L12 13L9 20L5 3Z" fill="#141413" stroke="#faf9f5" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ripple" id="ripple"></div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: radial-gradient(70cqw 70cqw at 50% 62%, rgba(204,120,92,0.18), rgba(204,120,92,0) 70%);
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4cqw;
+      }
+      .h1 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        font-size: 6.7cqw;
+        line-height: 1.05;
+        letter-spacing: -0.012em;
+        color: #141413;
+        margin: 0;
+        text-align: center;
+      }
+      .h1 .w {
+        display: inline-block;
+        will-change: transform, opacity;
+      }
+      .button {
+        font-family: Georgia, serif;
+        font-size: 2.6cqw;
+        color: #faf9f5;
+        background: #cc785c;
+        padding: 1.6cqw 4cqw;
+        border-radius: 9999px;
+        will-change: transform, opacity;
+      }
+      .cursor {
+        position: absolute;
+        width: 44px;
+        height: 44px;
+        margin: -22px 0 0 -22px;
+        pointer-events: none;
+        z-index: 9;
+        will-change: transform, opacity;
+      }
+      .ripple {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        margin: -60px 0 0 -60px;
+        border-radius: 50%;
+        border: 2px solid #cc785c;
+        opacity: 0;
+        transform: scale(0);
+        pointer-events: none;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["06-cta"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+        const words = q("#h1 .w");
+
+        // Anchor cursor + ripple to the real center of the button using layout
+        // offsets (unaffected by GSAP transforms like scale:0 at init time).
+        const btn = q("#button")[0];
+        const cur = q("#cursor")[0];
+        const cx = btn.offsetLeft + btn.offsetWidth / 2;
+        const cy = btn.offsetTop + btn.offsetHeight / 2;
+        cur.style.left = cx + "px";
+        cur.style.top = cy + "px";
+        const rRipple = q("#ripple")[0];
+        rRipple.style.left = cx + "px";
+        rRipple.style.top = cy + "px";
+
+        words.forEach((el, i) => {
+          tl.fromTo(el,
+            { opacity: 0, y: 26, scale: 0.96 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" },
+            0.2 + i * 0.34);
+        });
+
+        tl.fromTo(q("#button"),
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 3.0);
+
+        tl.fromTo(q("#cursor"),
+          { opacity: 0 },
+          { opacity: 1, duration: 0.05, ease: "none" }, 3.8);
+        tl.fromTo(q("#cursor"),
+          { x: -220, y: 120 },
+          { x: 0, y: 0, duration: 1.0, ease: "power2.out" }, 3.8);
+
+        tl.to(q(["#cursor", "#button"]),
+          { scale: 0.92, duration: 0.1, ease: "power2.in", yoyo: true, repeat: 1 }, 4.2);
+
+        tl.set(q("#ripple"), { opacity: 1 }, 4.2);
+        tl.fromTo(q("#ripple"),
+          { scale: 0, opacity: 1 },
+          { scale: 5, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 4.2);
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.2,
+          duration: 0.6,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            gsap.set(q("#button"), { y: y });
+          }
+        }, 4.2);
+
+        window.__timelines["06-cta"] = tl;
+      };
+      window.__frameOut["06-cta"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
+      };
+    </script>
+  </div></template>
+
+
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        window.__frameInit = window.__frameInit || {};
+        window.__frameOut = window.__frameOut || {};
+        window.__frameEnter = window.__frameEnter || {};
+        const TOTAL = 30;
+        const LEAD = 0.45;
+        const scenes = Array.from(document.querySelectorAll(".scene"));
+        const meta = scenes.map((el) => ({
+          el, frame: el.dataset.frame,
+          start: parseFloat(el.dataset.start), duration: parseFloat(el.dataset.duration),
+          leaving: false, entered: false,
+        }));
+        function boot() {
+          meta.forEach((m) => {
+            const tpl = document.getElementById("tpl-" + m.frame);
+            if (!tpl) return;
+            const node = tpl.content.firstElementChild.cloneNode(true);
+            m.el.appendChild(node);
+            const init = window.__frameInit[m.frame];
+            if (init) { try { init(node); } catch (e) { console.error("frame " + m.frame + " init failed", e); } }
+          });
+          requestAnimationFrame(() => requestAnimationFrame(play));
+        }
+        let started = false;
+        function play() {
+          if (started) return; started = true;
+          let t0 = null;
+          function tick(now) {
+            if (t0 === null) t0 = now;
+            let t = ((now - t0) / 1000) % TOTAL;
+            meta.forEach((m) => {
+              const local = t - m.start;
+              const visible = local >= 0 && local < m.duration;
+              m.el.classList.toggle("is-active", visible);
+              if (visible && !m.entered) {
+                m.entered = true;
+                const enter = window.__frameEnter[m.frame];
+                if (enter) { try { enter(m.el.firstElementChild); } catch (e) {} }
+              }
+              if (!visible) m.entered = false;
+              if (visible && local >= m.duration - LEAD && !m.leaving) {
+                m.leaving = true;
+                const out = window.__frameOut[m.frame];
+                if (out) { try { out(m.el.firstElementChild); } catch (e) {} }
+              }
+              if (local < 0 || local >= m.duration) m.leaving = false;
+              const tl = window.__timelines[m.frame];
+              if (tl) { const lt = Math.max(0, Math.min(local, m.duration)); tl.time(lt); }
+            });
+            requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        }
+        if (window.gsap) boot();
+        else window.addEventListener("load", () => { if (window.gsap) boot(); });
+      })();
+    </script>
+  </body>
+</html>

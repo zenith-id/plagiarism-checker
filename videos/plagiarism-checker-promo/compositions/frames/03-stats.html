@@ -1,0 +1,163 @@
+<template>
+  <div id="root" data-composition-id="03-stats" data-start="0" data-duration="8.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="8" data-track-index="0"></div>
+
+    <div class="stage">
+      <div class="kicker" id="kicker"><span class="star">✱</span> Statistik</div>
+      <div class="title" id="title">Dalam satu proses</div>
+      <div class="row" id="row">
+        <div class="tile tile-hero">
+          <span class="figure" id="figure">0</span>
+          <span class="unit">file/batch</span>
+        </div>
+        <div class="tile" id="t2"><span class="figure-sm">3</span><span class="unit">algoritma</span></div>
+        <div class="tile" id="t3"><span class="figure-sm">PDF</span><span class="unit">ekspor</span></div>
+        <div class="tile" id="t4"><span class="figure-sm">100%</span><span class="unit">lokal</span></div>
+      </div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image:
+          linear-gradient(rgba(20,20,19,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20,20,19,0.05) 1px, transparent 1px);
+        background-size: 5cqw 5cqw;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        gap: 3cqw;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.6cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+        will-change: transform, opacity;
+      }
+      .kicker .star {
+        color: #cc785c;
+        margin-right: 0.4cqw;
+      }
+      .title {
+        font-family: Georgia, serif;
+        font-size: 3.6cqw;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        color: #141413;
+        will-change: transform, opacity;
+      }
+      .row {
+        display: flex;
+        align-items: stretch;
+        gap: 2.2cqw;
+      }
+      .tile {
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        padding: 3cqw 2.4cqw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.8cqw;
+        will-change: transform, opacity;
+      }
+      .tile-hero {
+        background: #faf9f5;
+        padding: 3cqw 3cqw;
+        min-width: 26cqw;
+      }
+      .figure {
+        font-family: Georgia, serif;
+        font-size: 9.4cqw;
+        line-height: 0.95;
+        letter-spacing: -0.025em;
+        color: #141413;
+        display: inline-block;
+        font-variant-numeric: tabular-nums;
+        transform-origin: center center;
+        will-change: transform;
+      }
+      .figure-sm {
+        font-family: Georgia, serif;
+        font-size: 4.6cqw;
+        line-height: 1;
+        color: #141413;
+      }
+      .unit {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.35cqw;
+        letter-spacing: 0.04em;
+        color: #141413;
+        opacity: 0.78;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["03-stats"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo(q("#kicker"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
+        tl.fromTo(q("#title"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.25);
+        tl.fromTo(q("#row"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.4);
+
+        const extras = ["#t2", "#t3", "#t4"];
+        extras.forEach((sel, i) => {
+          const dir = i === 0 ? -1 : 1;
+          tl.fromTo(q(sel),
+            { opacity: 0, scale: 0.8, x: dir * 6 },
+            { opacity: 1, scale: 1, x: 0, duration: 0.6, ease: "power3.out" },
+            2.2 + i * 0.3);
+        });
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.2,
+          duration: 1.5,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            gsap.set(q("#row"), { y: y });
+          }
+        }, 2.6);
+
+        window.__timelines["03-stats"] = tl;
+      };
+      window.__frameEnter["03-stats"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const figure = q("#figure")[0];
+        const counter = { v: 0 };
+        gsap.to(counter, {
+          v: 200, duration: 1.6, ease: "power3.out",
+          onUpdate: () => { figure.textContent = Math.round(counter.v); }
+        });
+        gsap.fromTo(figure, { scale: 0.5 }, { scale: 1, duration: 1.6, ease: "power3.out" });
+        gsap.fromTo(q(".tile-hero .unit"), { opacity: 0 }, { opacity: 0.78, duration: 0.5, delay: 0.8 });
+      };
+      window.__frameOut["03-stats"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, x: -5cqw, duration: 0.45, ease: "power2.in" });
+      };
+    </script>
+  </div>
+</template>

@@ -1,0 +1,152 @@
+<template>
+  <div id="root" data-composition-id="06-cta" data-start="0" data-duration="10" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+    <div class="stage">
+      <h1 class="h1" id="h1">
+        <span class="w">Siap</span> <span class="w">memeriksa</span> <span class="w">dokumen?</span>
+      </h1>
+      <div class="button" id="button">Buka Aplikasi</div>
+
+      <div class="cursor" id="cursor">
+        <svg width="44" height="44" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 3L19 12L12 13L9 20L5 3Z" fill="#141413" stroke="#faf9f5" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ripple" id="ripple"></div>
+    </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: radial-gradient(70cqw 70cqw at 50% 62%, rgba(204,120,92,0.18), rgba(204,120,92,0) 70%);
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4cqw;
+      }
+      .h1 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        font-size: 6.7cqw;
+        line-height: 1.05;
+        letter-spacing: -0.012em;
+        color: #141413;
+        margin: 0;
+        text-align: center;
+      }
+      .h1 .w {
+        display: inline-block;
+        will-change: transform, opacity;
+      }
+      .button {
+        font-family: Georgia, serif;
+        font-size: 2.6cqw;
+        color: #faf9f5;
+        background: #cc785c;
+        padding: 1.6cqw 4cqw;
+        border-radius: 9999px;
+        will-change: transform, opacity;
+      }
+      .cursor {
+        position: absolute;
+        width: 44px;
+        height: 44px;
+        margin: -22px 0 0 -22px;
+        pointer-events: none;
+        z-index: 9;
+        will-change: transform, opacity;
+      }
+      .ripple {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        margin: -60px 0 0 -60px;
+        border-radius: 50%;
+        border: 2px solid #cc785c;
+        opacity: 0;
+        transform: scale(0);
+        pointer-events: none;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
+      window.__frameInit["06-cta"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+        const words = q("#h1 .w");
+
+        // Anchor cursor + ripple to the real center of the button using layout
+        // offsets (unaffected by GSAP transforms like scale:0 at init time).
+        const btn = q("#button")[0];
+        const cur = q("#cursor")[0];
+        const cx = btn.offsetLeft + btn.offsetWidth / 2;
+        const cy = btn.offsetTop + btn.offsetHeight / 2;
+        cur.style.left = cx + "px";
+        cur.style.top = cy + "px";
+        const rRipple = q("#ripple")[0];
+        rRipple.style.left = cx + "px";
+        rRipple.style.top = cy + "px";
+
+        words.forEach((el, i) => {
+          tl.fromTo(el,
+            { opacity: 0, y: 26, scale: 0.96 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" },
+            0.2 + i * 0.34);
+        });
+
+        tl.fromTo(q("#button"),
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 3.0);
+
+        tl.fromTo(q("#cursor"),
+          { opacity: 0 },
+          { opacity: 1, duration: 0.05, ease: "none" }, 3.8);
+        tl.fromTo(q("#cursor"),
+          { x: -220, y: 120 },
+          { x: 0, y: 0, duration: 1.0, ease: "power2.out" }, 3.8);
+
+        tl.to(q(["#cursor", "#button"]),
+          { scale: 0.92, duration: 0.1, ease: "power2.in", yoyo: true, repeat: 1 }, 4.2);
+
+        tl.set(q("#ripple"), { opacity: 1 }, 4.2);
+        tl.fromTo(q("#ripple"),
+          { scale: 0, opacity: 1 },
+          { scale: 5, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 4.2);
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.2,
+          duration: 0.6,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            gsap.set(q("#button"), { y: y });
+          }
+        }, 4.2);
+
+        window.__timelines["06-cta"] = tl;
+      };
+      window.__frameOut["06-cta"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
+      };
+    </script>
+  </div>
+</template>

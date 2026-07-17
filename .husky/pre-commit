@@ -1,0 +1,11 @@
+#!/bin/sh
+
+bun test || true
+
+STAGED_FILE_COUNT=$(git diff --cached --name-only | grep -v '^[[:space:]]*$' | wc -l)
+
+if [ "$STAGED_FILE_COUNT" -gt 3 ]; then
+  echo "Error: too many files in commit ($STAGED_FILE_COUNT files)."
+  echo "Maximum 3 files per commit."
+  exit 1
+fi

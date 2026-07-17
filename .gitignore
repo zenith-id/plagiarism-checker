@@ -1,0 +1,9 @@
+node_modules
+.agents
+agent/
+.claude
+.env
+*.md
+!README.md
+!CHANGELOG.md
+assets/

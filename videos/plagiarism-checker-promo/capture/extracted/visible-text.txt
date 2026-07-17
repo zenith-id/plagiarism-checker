@@ -1,0 +1,23 @@
+# Visible Text — Plagiarism Checker Landing Page (verbatim source)
+
+## Hero
+- Badge: Deteksi plagiarisme tugas mahasiswa
+- H1: Cek kemiripan dokumen secara massal, cepat, dan lokal.
+- Subcopy: Unggah ratusan file sekaligus, dapatkan laporan kemiripan berbasis TF-IDF, N-Gram, dan LCS tanpa mengunggah data ke server eksternal.
+- Stats: 200 file/batch · 3 algoritma · Export PDF · 100% lokal
+
+## Fitur utama (FeatureGrid)
+1. Pemrosesan massal — Unggah hingga 200 dokumen per batch dengan berbagai format: .txt, .docx, dan .pdf.
+2. Multi-algoritma — Kombinasi TF-IDF Cosine, 5-Gram Overlap, dan LCS untuk hasil yang akurat.
+3. Laporan lengkap — Ringkasan, peringkat pasangan, dan tampilan sorotan kemiripan yang dapat diekspor PDF.
+4. Ambang batas kustom — Atur threshold kemiripan dan mode analisis (Normal, Strict, Word Overlap) sesuai kebutuhan.
+
+## Cara kerja (HowItWorks)
+1. Unggah dokumen — Pilih file tugas mahasiswa atau sebutkan nama mata kuliah sebagai konteks.
+2. Analisis otomatis — Sistem menghitung kemiripan antar dokumen menggunakan beberapa algoritma.
+3. Tinjau & ekspor — Lihat peringkat pasangan mencurigakan dan unduh laporan dalam format PDF.
+
+## CTA (CtaSection)
+- H2: Siap memeriksa dokumen?
+- Copy: Mulai sekarang tanpa akun dan tanpa unggah ke cloud. Semua berjalan di perangkat Anda.
+- Button: Buka Aplikasi
