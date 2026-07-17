@@ -27,120 +27,118 @@
         </div>
       </div>
     </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
+        background-size: 4cqw 4cqw;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3cqw;
+        padding: 0 8cqw;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.46cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star { color: #cc785c; margin-right: 0.4cqw; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2.4cqw;
+      }
+      .card {
+        width: 34cqw;
+        height: 18cqw;
+        background: #faf9f5;
+        border: 1px solid rgba(20,20,19,0.12);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+        padding: 2.2cqw;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6cqw;
+        will-change: transform, opacity;
+      }
+      .icon {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 2.2cqw;
+        color: #a9583e;
+        margin-bottom: 0.4cqw;
+      }
+      .ct {
+        font-family: Georgia, serif;
+        font-size: 2.3cqw;
+        letter-spacing: -0.005em;
+        color: #141413;
+      }
+      .cb {
+        font-family: Georgia, serif;
+        font-size: 1.5cqw;
+        line-height: 1.5;
+        color: #141413;
+        opacity: 0.82;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameInit["04-features"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo(q("#kicker"),
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
+
+        tl.fromTo(q("#c1"),
+          { scale: 0, opacity: 0, y: 16 },
+          { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.3);
+
+        const rest = ["#c2", "#c3", "#c4"];
+        const dirs = [
+          { x: 0, y: -8 }, { x: -8, y: 8 }, { x: 8, y: 8 }
+        ];
+        rest.forEach((sel, i) => {
+          tl.fromTo(q(sel),
+            { scale: 0, opacity: 0, x: dirs[i].x, y: dirs[i].y },
+            { scale: 1, opacity: 1, x: 0, y: 0, duration: 0.6, ease: "power3.out" },
+            2.7 + i * 0.7);
+        });
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.4,
+          duration: 3.5,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            gsap.set(q("#grid"), { y: y });
+          }
+        }, 6.5);
+
+        window.__timelines["04-features"] = tl;
+      };
+    </script>
   </div>
-
-  <style>
-    #root {
-      container-type: size;
-      width: 100%; height: 100%;
-      position: relative;
-      font-family: Georgia, serif;
-    }
-    .ground {
-      position: absolute;
-      inset: 0;
-      background-color: #faf9f5;
-      background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-      background-size: 4cqw 4cqw;
-    }
-    .stage {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3cqw;
-      padding: 0 8cqw;
-    }
-    .kicker {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 1.46cqw;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #141413;
-      opacity: 0;
-    }
-    .kicker .star { color: #cc785c; margin-right: 0.4cqw; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2.4cqw;
-    }
-    .card {
-      width: 34cqw;
-      height: 18cqw;
-      background: #faf9f5;
-      border: 1px solid rgba(20,20,19,0.12);
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
-      padding: 2.2cqw;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6cqw;
-      opacity: 0;
-      will-change: transform, opacity;
-    }
-    .icon {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 2.2cqw;
-      color: #a9583e;
-      margin-bottom: 0.4cqw;
-    }
-    .ct {
-      font-family: Georgia, serif;
-      font-size: 2.3cqw;
-      letter-spacing: -0.005em;
-      color: #141413;
-    }
-    .cb {
-      font-family: Georgia, serif;
-      font-size: 1.5cqw;
-      line-height: 1.5;
-      color: #141413;
-      opacity: 0.82;
-    }
-  </style>
-
-  <script>
-    window.__timelines = window.__timelines || {};
-    window.__frameInit = window.__frameInit || {};
-    window.__frameInit["04-features"] = function (root) {
-      if (!window.gsap) return;
-      const q = gsap.utils.selector(root);
-      const tl = gsap.timeline({ paused: true });
-
-      tl.fromTo(q("#kicker"),
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
-
-      tl.fromTo(q("#c1"),
-        { scale: 0, opacity: 0, y: 16 },
-        { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.3);
-
-      const rest = ["#c2", "#c3", "#c4"];
-      const dirs = [
-        { x: 0, y: -8 }, { x: -8, y: 8 }, { x: 8, y: 8 }
-      ];
-      rest.forEach((sel, i) => {
-        tl.fromTo(q(sel),
-          { scale: 0, opacity: 0, x: dirs[i].x, y: dirs[i].y },
-          { scale: 1, opacity: 1, x: 0, y: 0, duration: 0.6, ease: "power3.out" },
-          2.7 + i * 0.7);
-      });
-
-      const phase = { p: 0 };
-      tl.to(phase, {
-        p: Math.PI * 2 * 1.4,
-        duration: 3.5,
-        ease: "none",
-        onUpdate: () => {
-          const y = Math.sin(phase.p) * 2.5;
-          gsap.set(q("#grid"), { y: y });
-        }
-      }, 6.5);
-
-      window.__timelines["04-features"] = tl;
-    };
-  </script>
 </template>
