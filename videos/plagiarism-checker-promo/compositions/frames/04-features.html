@@ -39,8 +39,9 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image: radial-gradient(circle, rgba(204,120,92,0.12) 0.5cqw, transparent 0.7cqw);
+        background-size: 6cqw 6cqw;
+        background-position: 0 0;
       }
       .stage {
         position: absolute;
@@ -102,6 +103,7 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["04-features"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
@@ -138,6 +140,9 @@
         }, 6.5);
 
         window.__timelines["04-features"] = tl;
+      };
+      window.__frameOut["04-features"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, y: 3cqw, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div>

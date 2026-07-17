@@ -40,8 +40,7 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image: repeating-linear-gradient(115deg, rgba(93,184,166,0.10) 0 0.4cqw, transparent 0.4cqw 4cqw);
       }
       .viewport {
         position: absolute;
@@ -132,6 +131,7 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["05-howitworks"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
@@ -142,16 +142,16 @@
           { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
 
         tl.fromTo(q("#s1"),
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
 
         tl.fromTo(q("#s2"),
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 4.2);
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 1.6);
 
         tl.fromTo(q("#s3"),
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 7.6);
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 3.0);
 
         const p1 = q("#path1")[0];
         const p2 = q("#path2")[0];
@@ -160,8 +160,8 @@
           p.style.strokeDasharray = len;
           p.style.strokeDashoffset = len;
         });
-        tl.to(p1, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 1.0);
-        tl.to(p2, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 5.0);
+        tl.to(p1, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 1.0);
+        tl.to(p2, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 2.4);
 
         const phase = { p: 0 };
         tl.to(phase, {
@@ -172,9 +172,12 @@
             const y = Math.sin(phase.p) * 2;
             gsap.set(q(["#s1", "#s2", "#s3"]), { y: y });
           }
-        }, 8.2);
+        }, 4.2);
 
         window.__timelines["05-howitworks"] = tl;
+      };
+      window.__frameOut["05-howitworks"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div>

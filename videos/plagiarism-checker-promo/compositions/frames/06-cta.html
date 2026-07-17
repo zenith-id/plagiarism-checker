@@ -27,8 +27,7 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image: radial-gradient(70cqw 70cqw at 50% 62%, rgba(204,120,92,0.18), rgba(204,120,92,0) 70%);
       }
       .stage {
         position: absolute;
@@ -64,8 +63,6 @@
       }
       .cursor {
         position: absolute;
-        left: 50%;
-        top: 58%;
         width: 44px;
         height: 44px;
         margin: -22px 0 0 -22px;
@@ -75,8 +72,6 @@
       }
       .ripple {
         position: absolute;
-        left: 50%;
-        top: 58%;
         width: 120px;
         height: 120px;
         margin: -60px 0 0 -60px;
@@ -91,11 +86,25 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["06-cta"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
         const tl = gsap.timeline({ paused: true });
         const words = q("#h1 .w");
+
+        // Anchor cursor to the real center of the button.
+        const btn = q("#button")[0];
+        const cur = q("#cursor")[0];
+        const rRoot = root.getBoundingClientRect();
+        const rBtn = btn.getBoundingClientRect();
+        const cx = rBtn.left - rRoot.left + rBtn.width / 2;
+        const cy = rBtn.top - rRoot.top + rBtn.height / 2;
+        cur.style.left = cx + "px";
+        cur.style.top = cy + "px";
+        const rRipple = q("#ripple")[0];
+        rRipple.style.left = cx + "px";
+        rRipple.style.top = cy + "px";
 
         words.forEach((el, i) => {
           tl.fromTo(el,
@@ -135,6 +144,9 @@
         }, 7.0);
 
         window.__timelines["06-cta"] = tl;
+      };
+      window.__frameOut["06-cta"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div>
