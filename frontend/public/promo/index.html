@@ -8,7 +8,7 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { width: 100%; height: 100%; overflow: hidden; background: #faf9f5; }
       #stage { position: relative; width: 100%; height: 100%; overflow: hidden; background: #faf9f5; }
-      .scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; will-change: opacity; }
+      .scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; will-change: opacity, transform; }
       .scene.is-active { opacity: 1; visibility: visible; }
     </style>
   </head>
@@ -46,8 +46,7 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image: radial-gradient(60cqw 60cqw at 50% 42%, rgba(204,120,92,0.16), rgba(204,120,92,0) 70%);
       }
       .stage {
         position: absolute;
@@ -78,12 +77,8 @@
         line-height: 1.16;
         letter-spacing: -0.018em;
         color: #141413;
-        max-width: 70cqw;
+        max-width: 78cqw;
         margin: 0;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
       }
       .h1 .w {
         display: inline-block;
@@ -94,6 +89,7 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["01-hook"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
@@ -107,13 +103,13 @@
         words.forEach((el, i) => {
           tl.fromTo(el,
             { opacity: 0, y: 26, scale: 0.96 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" },
-            2.0 + i * 0.32);
+            { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" },
+            0.15 + i * 0.16);
         });
 
         tl.fromTo(root,
           { scale: 1.02 },
-          { scale: 1, duration: 5.0, ease: "power2.out" }, 2.0);
+          { scale: 1, duration: 4.0, ease: "power2.out" }, 0.15);
 
         const phase = { p: 0 };
         tl.to(phase, {
@@ -124,9 +120,12 @@
             const y = Math.sin(phase.p) * 2.5;
             words.forEach((el) => { el.style.transform = `translateY(${y}px)`; });
           }
-        }, 5.0);
+        }, 4.5);
 
         window.__timelines["01-hook"] = tl;
+      };
+      window.__frameOut["01-hook"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div></template>
@@ -141,6 +140,7 @@
         <div class="chip" id="chip3">LCS</div>
         <div class="shield" id="shield">100% lokal</div>
       </div>
+      <div class="caption" id="caption">3 algoritma. 1 proses, sepenuhnya di mesin lokal.</div>
     </div>
 
     <style>
@@ -154,14 +154,18 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image:
+          radial-gradient(circle, rgba(93,184,166,0.10) 1.4cqw, transparent 1.6cqw),
+          radial-gradient(circle, rgba(93,184,166,0.07) 3cqw, transparent 3.2cqw),
+          radial-gradient(circle, rgba(93,184,166,0.05) 5cqw, transparent 5.2cqw);
+        background-position: 50% 50%;
       }
       .stage {
         position: absolute;
         inset: 0;
         display: grid;
         place-items: center;
+        gap: 3cqw;
       }
       .ring {
         position: relative;
@@ -208,11 +212,21 @@
         background: #cc785c;
         will-change: transform, opacity;
       }
+      .caption {
+        font-family: Georgia, serif;
+        font-size: 2.4cqw;
+        line-height: 1.3;
+        color: #141413;
+        text-align: center;
+        max-width: 56cqw;
+        will-change: transform, opacity;
+      }
     </style>
 
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["02-value"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
@@ -233,6 +247,10 @@
           { scale: 0.4, opacity: 0 },
           { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, 2.7);
 
+        tl.fromTo(q("#caption"),
+          { opacity: 0, y: 18 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.4);
+
         const phase = { p: 0 };
         tl.to(phase, {
           p: Math.PI * 2 * 1.3,
@@ -245,6 +263,9 @@
         }, 5.5);
 
         window.__timelines["02-value"] = tl;
+      };
+      window.__frameOut["02-value"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div></template>
@@ -276,8 +297,10 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image:
+          linear-gradient(rgba(20,20,19,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20,20,19,0.05) 1px, transparent 1px);
+        background-size: 5cqw 5cqw;
       }
       .stage {
         position: absolute;
@@ -345,6 +368,7 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["03-stats"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
@@ -363,7 +387,7 @@
         tl.fromTo(q(".tile-hero .unit"), { opacity: 0 }, { opacity: 0.78, duration: 0.5 }, 0.9);
 
         tl.fromTo(q("#title"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
-        tl.fromTo(q("#row"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.3);
+        tl.fromTo(q("#row"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.3);
 
         const extras = ["#t2", "#t3", "#t4"];
         extras.forEach((sel, i) => {
@@ -386,6 +410,9 @@
         }, 5.0);
 
         window.__timelines["03-stats"] = tl;
+      };
+      window.__frameOut["03-stats"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div></template>
@@ -430,8 +457,9 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image: radial-gradient(circle, rgba(204,120,92,0.12) 0.5cqw, transparent 0.7cqw);
+        background-size: 6cqw 6cqw;
+        background-position: 0 0;
       }
       .stage {
         position: absolute;
@@ -493,6 +521,7 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["04-features"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
@@ -529,6 +558,9 @@
         }, 6.5);
 
         window.__timelines["04-features"] = tl;
+      };
+      window.__frameOut["04-features"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, y: 3cqw, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div></template>
@@ -574,8 +606,7 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image: repeating-linear-gradient(115deg, rgba(93,184,166,0.10) 0 0.4cqw, transparent 0.4cqw 4cqw);
       }
       .viewport {
         position: absolute;
@@ -666,6 +697,7 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["05-howitworks"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
@@ -676,16 +708,16 @@
           { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
 
         tl.fromTo(q("#s1"),
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
 
         tl.fromTo(q("#s2"),
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 4.2);
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 1.6);
 
         tl.fromTo(q("#s3"),
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 7.6);
+          { x: -40, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 3.0);
 
         const p1 = q("#path1")[0];
         const p2 = q("#path2")[0];
@@ -694,8 +726,8 @@
           p.style.strokeDasharray = len;
           p.style.strokeDashoffset = len;
         });
-        tl.to(p1, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 1.0);
-        tl.to(p2, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 5.0);
+        tl.to(p1, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 1.0);
+        tl.to(p2, { strokeDashoffset: 0, duration: 0.6, ease: "power2.out" }, 2.4);
 
         const phase = { p: 0 };
         tl.to(phase, {
@@ -706,9 +738,12 @@
             const y = Math.sin(phase.p) * 2;
             gsap.set(q(["#s1", "#s2", "#s3"]), { y: y });
           }
-        }, 8.2);
+        }, 4.2);
 
         window.__timelines["05-howitworks"] = tl;
+      };
+      window.__frameOut["05-howitworks"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div></template>
@@ -741,8 +776,7 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image: radial-gradient(70cqw 70cqw at 50% 62%, rgba(204,120,92,0.18), rgba(204,120,92,0) 70%);
       }
       .stage {
         position: absolute;
@@ -778,8 +812,6 @@
       }
       .cursor {
         position: absolute;
-        left: 50%;
-        top: 58%;
         width: 44px;
         height: 44px;
         margin: -22px 0 0 -22px;
@@ -789,8 +821,6 @@
       }
       .ripple {
         position: absolute;
-        left: 50%;
-        top: 58%;
         width: 120px;
         height: 120px;
         margin: -60px 0 0 -60px;
@@ -805,11 +835,25 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["06-cta"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
         const tl = gsap.timeline({ paused: true });
         const words = q("#h1 .w");
+
+        // Anchor cursor to the real center of the button.
+        const btn = q("#button")[0];
+        const cur = q("#cursor")[0];
+        const rRoot = root.getBoundingClientRect();
+        const rBtn = btn.getBoundingClientRect();
+        const cx = rBtn.left - rRoot.left + rBtn.width / 2;
+        const cy = rBtn.top - rRoot.top + rBtn.height / 2;
+        cur.style.left = cx + "px";
+        cur.style.top = cy + "px";
+        const rRipple = q("#ripple")[0];
+        rRipple.style.left = cx + "px";
+        rRipple.style.top = cy + "px";
 
         words.forEach((el, i) => {
           tl.fromTo(el,
@@ -850,6 +894,9 @@
 
         window.__timelines["06-cta"] = tl;
       };
+      window.__frameOut["06-cta"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, scale: 0.96, duration: 0.4, ease: "power2.in" });
+      };
     </script>
   </div></template>
 
@@ -858,11 +905,14 @@
       (function () {
         window.__timelines = window.__timelines || {};
         window.__frameInit = window.__frameInit || {};
+        window.__frameOut = window.__frameOut || {};
         const TOTAL = 55;
+        const LEAD = 0.45;
         const scenes = Array.from(document.querySelectorAll(".scene"));
         const meta = scenes.map((el) => ({
           el, frame: el.dataset.frame,
           start: parseFloat(el.dataset.start), duration: parseFloat(el.dataset.duration),
+          leaving: false,
         }));
         function boot() {
           meta.forEach((m) => {
@@ -884,7 +934,14 @@
             let t = ((now - t0) / 1000) % TOTAL;
             meta.forEach((m) => {
               const local = t - m.start;
-              m.el.classList.toggle("is-active", local >= 0 && local < m.duration);
+              const visible = local >= 0 && local < m.duration;
+              m.el.classList.toggle("is-active", visible);
+              if (visible && local >= m.duration - LEAD && !m.leaving) {
+                m.leaving = true;
+                const out = window.__frameOut[m.frame];
+                if (out) { try { out(m.el.firstElementChild); } catch (e) {} }
+              }
+              if (local < 0 || local >= m.duration) m.leaving = false;
               const tl = window.__timelines[m.frame];
               if (tl) { const lt = Math.max(0, Math.min(local, m.duration)); tl.time(lt); }
             });
