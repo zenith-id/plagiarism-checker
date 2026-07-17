@@ -59,14 +59,19 @@ Setiap file memiliki **2 level pengecekan status**:
 
 ## Arsitektur Sistem
 
+%%{init: {"flowchart": {"nodeSpacing": 50, "rankSpacing": 60, "curve": "basis"}}}%%
+
 ### Diagram Backend (Hono.js :3002)
+
+Alur atas → bawah: request masuk, diteruskan ke modul fitur, lalu ke core engine, terakhir menyentuh state memory.
 
 ```mermaid
 flowchart TD
-    APP["app.ts<br/>CORS, Error Handler"]
+    APP["app.ts<br/>CORS & Error Handler"]
     GW["Route Gateway"]
 
     subgraph M["Feature Modules"]
+        direction TB
         DOC["documents<br/>(upload, parse)"]
         ANL["analysis<br/>(orchestrator)"]
         SET["settings<br/>(threshold)"]
@@ -75,76 +80,93 @@ flowchart TD
     end
 
     subgraph C["Core Engine (lib)"]
+        direction TB
         ALG["algorithms<br/>tf-idf, n-gram, lcs"]
         PAR["parsers<br/>pdf, docx, ocr"]
         TXT["text-utils<br/>cleaner"]
     end
 
-    ST["shared/state<br/>in-memory"]
+    ST["shared/state<br/>in-memory store"]
 
     APP --> GW
-    GW --> M
+    GW --> DOC
+    GW --> ANL
+    GW --> SET
+    GW --> EXP
+    GW --> HTH
     ANL --> ALG
     ANL --> TXT
     DOC --> PAR
-    M --> ST
+    DOC --> ST
+    ANL --> ST
+    SET --> ST
 ```
 
 ### Diagram Frontend (Next.js :3000)
 
+Alur atas → bawah: halaman merender fitur & UI, fitur memanggil layer `lib`, lalu `api.ts` berkomunikasi ke backend.
+
 ```mermaid
 flowchart TD
-    PAGE["App Router Pages<br/>(marketing) + (app)/dashboard"]
-
-    subgraph LIB["lib/"]
-        API["api.ts<br/>HTTP client"]
-        STORE["store.ts<br/>Zustand"]
-        SCH["schemas.ts<br/>zod"]
-        UTIL["scoring / ranking / highlight"]
-    end
+    PAGE["App Router Pages<br/>(marketing) & (app)/dashboard"]
 
     subgraph FEAT["components/features/"]
+        direction TB
         UP["upload"]
         RES["results"]
         DET["detail"]
         SET["settings"]
     end
 
-    UI["components/ui + layout + marketing"]
+    subgraph LIB["lib/"]
+        direction TB
+        API["api.ts<br/>HTTP client"]
+        STORE["store.ts<br/>Zustand"]
+        SCH["schemas.ts<br/>zod"]
+        UTIL["scoring / ranking / highlight"]
+    end
+
+    UI["components/ui<br/>+ layout + marketing"]
 
     PAGE --> FEAT
     PAGE --> UI
-    FEAT --> LIB
-    LIB --> API
-    STORE --> FEAT
+    FEAT --> STORE
+    FEAT --> API
+    FEAT --> SCH
+    FEAT --> UTIL
 ```
 
 ### Diagram Gabungan — Alur BE ⇄ FE
 
+Alur kiri → kanan: User → Frontend → Backend → Core Engine → balik ke Frontend → User.
+
 ```mermaid
 flowchart LR
+    U["👤 User / Browser"]
+
     subgraph FE["Frontend (Next.js :3000)"]
-        U["User / Browser"]
+        direction TB
         FX["React Pages + Features"]
         FAPI["api.ts (axios)"]
     end
 
     subgraph BE["Backend (Hono.js :3002)"]
+        direction TB
         BAPI["app.ts + Gateway"]
-        MOD["Feature Modules<br/>documents / analysis / settings / export"]
+        MOD["Feature Modules<br/>documents / analysis /<br/>settings / export"]
         ENG["Core Engine<br/>algorithms + parsers + cleaner"]
         ST["in-memory state"]
     end
 
-    U -->|upload file / klik analisis| FX
-    FX -->|HTTP POST /api/upload| FAPI
-    FAPI -->|HTTP request| BAPI
+    U -->|"1. upload file / klik analisis"| FX
+    FX -->|"2. HTTP POST /api/upload"| FAPI
+    FAPI -->|"3. HTTP request"| BAPI
     BAPI --> MOD --> ENG --> ST
-    ENG -->|skor similarity| MOD
-    MOD -->|JSON response| BAPI
-    BAPI -->|HTTP response| FAPI
-    FAPI -->|data ke store/UI| FX
-    FX -->|tampil ranking + detail| U
+    ENG -->|"4. skor similarity"| MOD
+    MOD -->|"5. JSON response"| BAPI
+    BAPI -->|"6. HTTP response"| FAPI
+    FAPI -->|"7. data ke store / UI"| FX
+    FX -->|"8. tampil ranking + detail"| U
 ```
 
 **Alur singkat:** User upload file di FE → FE kirim ke `/api/upload` → BE parse & simpan di memory → FE minta `/api/analyze` → BE hitung similarity (TF-IDF/LCS) → FE tampilkan ranking, graph, dan detail perbandingan.
