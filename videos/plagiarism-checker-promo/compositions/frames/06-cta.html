@@ -114,33 +114,33 @@
 
         tl.fromTo(q("#button"),
           { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 3.2);
+          { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 3.0);
 
         tl.fromTo(q("#cursor"),
           { opacity: 0 },
-          { opacity: 1, duration: 0.05, ease: "none" }, 4.6);
+          { opacity: 1, duration: 0.05, ease: "none" }, 3.8);
         tl.fromTo(q("#cursor"),
           { x: -220, y: 120 },
-          { x: 0, y: 0, duration: 1.0, ease: "power2.out" }, 4.6);
+          { x: 0, y: 0, duration: 1.0, ease: "power2.out" }, 3.8);
 
         tl.to(q(["#cursor", "#button"]),
-          { scale: 0.92, duration: 0.1, ease: "power2.in", yoyo: true, repeat: 1 }, 5.9);
+          { scale: 0.92, duration: 0.1, ease: "power2.in", yoyo: true, repeat: 1 }, 4.2);
 
-        tl.set(q("#ripple"), { opacity: 1 }, 5.9);
+        tl.set(q("#ripple"), { opacity: 1 }, 4.2);
         tl.fromTo(q("#ripple"),
           { scale: 0, opacity: 1 },
-          { scale: 5, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 5.9);
+          { scale: 5, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 4.2);
 
         const phase = { p: 0 };
         tl.to(phase, {
           p: Math.PI * 2 * 1.2,
-          duration: 3.0,
+          duration: 0.6,
           ease: "none",
           onUpdate: () => {
             const y = Math.sin(phase.p) * 2.5;
             gsap.set(q("#button"), { y: y });
           }
-        }, 7.0);
+        }, 4.2);
 
         window.__timelines["06-cta"] = tl;
       };

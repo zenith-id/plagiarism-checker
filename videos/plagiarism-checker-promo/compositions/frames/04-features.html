@@ -131,13 +131,13 @@
         const phase = { p: 0 };
         tl.to(phase, {
           p: Math.PI * 2 * 1.4,
-          duration: 3.5,
+          duration: 1.2,
           ease: "none",
           onUpdate: () => {
             const y = Math.sin(phase.p) * 2.5;
             gsap.set(q("#grid"), { y: y });
           }
-        }, 6.5);
+        }, 4.2);
 
         window.__timelines["04-features"] = tl;
       };
