@@ -3,6 +3,7 @@
     <div class="ground clip" data-start="0" data-duration="8" data-track-index="0"></div>
 
     <div class="stage">
+      <div class="title" id="title">Dalam satu proses</div>
       <div class="row" id="row">
         <div class="tile tile-hero">
           <span class="figure" id="figure">0</span>
@@ -26,13 +27,24 @@
     .ground {
       position: absolute;
       inset: 0;
-      background: #faf9f5;
+      background-color: #faf9f5;
+      background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
+      background-size: 4cqw 4cqw;
     }
     .stage {
       position: absolute;
       inset: 0;
       display: grid;
       place-items: center;
+      gap: 3cqw;
+    }
+    .title {
+      font-family: Georgia, serif;
+      font-size: 3cqw;
+      letter-spacing: -0.01em;
+      color: #141413;
+      opacity: 0;
+      will-change: transform, opacity;
     }
     .row {
       display: flex;
@@ -100,7 +112,8 @@
         onUpdate: () => { figure.textContent = Math.round(counter.v); }
       }, 0.1);
       tl.fromTo(figure, { scale: 0.5 }, { scale: 1, duration: 1.8, ease: "power3.out" }, 0.1);
-      tl.fromTo(".tile-hero", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.1);
+      tl.fromTo("#title", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+      tl.fromTo("#row", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.3);
       tl.fromTo(".tile-hero .unit", { opacity: 0 }, { opacity: 0.78, duration: 0.5 }, 0.9);
 
       // Three more tiles assemble into a row (2.0–5.0s), center-outward
