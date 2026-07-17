@@ -10,102 +10,100 @@
         <span class="w">dan</span> <span class="w">lokal.</span>
       </h1>
     </div>
+
+    <style>
+      #root {
+        container-type: size;
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: Georgia, serif;
+      }
+      .ground {
+        position: absolute;
+        inset: 0;
+        background-color: #faf9f5;
+        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
+        background-size: 4cqw 4cqw;
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3.5cqw;
+        padding: 0 8cqw;
+        text-align: center;
+      }
+      .kicker {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.46cqw;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #141413;
+      }
+      .kicker .star {
+        color: #cc785c;
+        margin-right: 0.4cqw;
+      }
+      .h1 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        font-size: 4.6cqw;
+        line-height: 1.16;
+        letter-spacing: -0.018em;
+        color: #141413;
+        max-width: 70cqw;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .h1 .w {
+        display: inline-block;
+        will-change: transform, opacity;
+      }
+    </style>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__frameInit = window.__frameInit || {};
+      window.__frameInit["01-hook"] = function (root) {
+        if (!window.gsap) return;
+        const q = gsap.utils.selector(root);
+        const tl = gsap.timeline({ paused: true });
+        const words = q("#h1 .w");
+
+        tl.fromTo(q("#kicker"),
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+
+        words.forEach((el, i) => {
+          tl.fromTo(el,
+            { opacity: 0, y: 26, scale: 0.96 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" },
+            2.0 + i * 0.32);
+        });
+
+        tl.fromTo(root,
+          { scale: 1.02 },
+          { scale: 1, duration: 5.0, ease: "power2.out" }, 2.0);
+
+        const phase = { p: 0 };
+        tl.to(phase, {
+          p: Math.PI * 2 * 1.1,
+          duration: 3.0,
+          ease: "none",
+          onUpdate: () => {
+            const y = Math.sin(phase.p) * 2.5;
+            words.forEach((el) => { el.style.transform = `translateY(${y}px)`; });
+          }
+        }, 5.0);
+
+        window.__timelines["01-hook"] = tl;
+      };
+    </script>
   </div>
-
-  <style>
-    #root {
-      container-type: size;
-      width: 100%; height: 100%;
-      position: relative;
-      font-family: Georgia, serif;
-    }
-    .ground {
-      position: absolute;
-      inset: 0;
-      background-color: #faf9f5;
-      background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-      background-size: 4cqw 4cqw;
-    }
-    .stage {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3.5cqw;
-      padding: 0 8cqw;
-      text-align: center;
-    }
-    .kicker {
-      font-family: "JetBrains Mono", monospace;
-      font-size: 1.46cqw;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: #141413;
-      opacity: 0;
-    }
-    .kicker .star {
-      color: #cc785c;
-      margin-right: 0.4cqw;
-    }
-    .h1 {
-      font-family: Georgia, serif;
-      font-weight: 400;
-      font-size: 4.6cqw;
-      line-height: 1.16;
-      letter-spacing: -0.018em;
-      color: #141413;
-      max-width: 70cqw;
-      margin: 0;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .h1 .w {
-      display: inline-block;
-      opacity: 0;
-      will-change: transform, opacity;
-    }
-  </style>
-
-  <script>
-    window.__timelines = window.__timelines || {};
-    window.__frameInit = window.__frameInit || {};
-    window.__frameInit["01-hook"] = function (root) {
-      if (!window.gsap) return;
-      const q = gsap.utils.selector(root);
-      const tl = gsap.timeline({ paused: true });
-      const words = q("#h1 .w");
-
-      tl.fromTo(q("#kicker"),
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
-
-      words.forEach((el, i) => {
-        tl.fromTo(el,
-          { opacity: 0, y: 26, scale: 0.96 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" },
-          2.0 + i * 0.32);
-      });
-
-      tl.fromTo(root,
-        { scale: 1.02 },
-        { scale: 1, duration: 5.0, ease: "power2.out" }, 2.0);
-
-      const phase = { p: 0 };
-      tl.to(phase, {
-        p: Math.PI * 2 * 1.1,
-        duration: 3.0,
-        ease: "none",
-        onUpdate: () => {
-          const y = Math.sin(phase.p) * 2.5;
-          words.forEach((el) => { el.style.transform = `translateY(${y}px)`; });
-        }
-      }, 5.0);
-
-      window.__timelines["01-hook"] = tl;
-    };
-  </script>
 </template>
