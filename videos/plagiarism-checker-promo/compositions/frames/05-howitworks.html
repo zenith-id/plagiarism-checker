@@ -1,0 +1,158 @@
+<template>
+  <div id="root" data-composition-id="05-howitworks" data-start="0" data-duration="10.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+    <div class="viewport" id="viewport">
+      <div class="canvas">
+        <div class="station" id="s1" style="left: 8cqw;">
+          <div class="badge">1</div>
+          <div class="st">Unggah dokumen</div>
+        </div>
+        <svg class="connector" id="conn1" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path id="path1" d="M 26 50 L 50 50" />
+        </svg>
+        <div class="station" id="s2" style="left: 41cqw;">
+          <div class="badge">2</div>
+          <div class="st">Analisis otomatis</div>
+        </div>
+        <svg class="connector" id="conn2" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path id="path2" d="M 59 50 L 83 50" />
+        </svg>
+        <div class="station" id="s3" style="left: 74cqw;">
+          <div class="badge">3</div>
+          <div class="st">Tinjau & ekspor</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    #root {
+      container-type: size;
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      font-family: Georgia, serif;
+      overflow: hidden;
+    }
+    .ground {
+      position: absolute;
+      inset: 0;
+      background: #faf9f5;
+    }
+    .viewport {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      will-change: transform;
+    }
+    .canvas {
+      position: relative;
+      width: 110cqw;
+      height: 40cqw;
+    }
+    .station {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24cqw;
+      height: 16cqw;
+      background: #faf9f5;
+      border: 1px solid rgba(20,20,19,0.12);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
+      display: flex;
+      align-items: center;
+      gap: 1.4cqw;
+      padding: 0 2cqw;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .badge {
+      flex: none;
+      width: 4.4cqw;
+      height: 4.4cqw;
+      border-radius: 9999px;
+      background: #F2E1DB;
+      border: 1px solid rgba(20,20,19,0.12);
+      display: grid;
+      place-items: center;
+      font-family: Georgia, serif;
+      font-size: 2.2cqw;
+      color: #141413;
+    }
+    .st {
+      font-family: Georgia, serif;
+      font-size: 2.1cqw;
+      line-height: 1.2;
+      color: #141413;
+    }
+    .connector {
+      position: absolute;
+      top: 50%;
+      height: 6cqw;
+      width: 33cqw;
+      transform: translateY(-50%);
+      overflow: visible;
+      pointer-events: none;
+    }
+    #conn1 { left: 24cqw; }
+    #conn2 { left: 57cqw; }
+    .connector path {
+      fill: none;
+      stroke: #a9583e;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    if (window.gsap) {
+      const tl = gsap.timeline({ paused: true });
+
+      // Station 1 enters + camera holds on it (0.0–3.0s)
+      tl.fromTo("#s1",
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
+
+      // Pan right to station 2 (3.0–6.5s) + draw connector 1→2
+      tl.to("#viewport", { x: -384, duration: 1.2, ease: "power2.inOut" }, 3.4);
+      tl.fromTo("#s2",
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 4.2);
+
+      // Pan to station 3 (6.5–10.0s) + draw connector 2→3
+      tl.to("#viewport", { x: -768, duration: 1.2, ease: "power2.inOut" }, 6.8);
+      tl.fromTo("#s3",
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 7.6);
+
+      // SVG path draws
+      ["#path1", "#path2"].forEach((id) => {
+        const p = document.querySelector(id);
+        const len = p.getTotalLength();
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+      });
+      tl.to("#path1", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 4.4);
+      tl.to("#path2", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 7.8);
+
+      // Hold + subtle jitter on stations (after last entry, ~8.2–10s)
+      const phase = { p: 0 };
+      tl.to(phase, {
+        p: Math.PI * 2 * 0.7,
+        duration: 1.8,
+        ease: "none",
+        onUpdate: () => {
+          const y = Math.sin(phase.p) * 2;
+          gsap.set("#s3", { y: y });
+        }
+      }, 8.2);
+
+      window.__timelines["05-howitworks"] = tl;
+    }
+  </script>
+</template>
