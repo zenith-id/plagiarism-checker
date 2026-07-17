@@ -51,7 +51,7 @@
         gap: 2.2cqw;
       }
       .tile {
-        background: #F2E1DB;
+        background: #faf9f5;
         border: 1px solid rgba(20,20,19,0.12);
         border-radius: 12px;
         box-shadow: 0 1px 3px rgba(20,20,19,0.08), 0 4px 16px rgba(20,20,19,0.04);
@@ -141,7 +141,7 @@
         window.__timelines["03-stats"] = tl;
       };
       window.__frameOut["03-stats"] = function (root) {
-        if (!window.gsap) return gsap.to(root, { opacity: 0, duration: 0.4, ease: "power2.in" });
+        if (!window.gsap) return gsap.to(root, { opacity: 0, x: -5cqw, duration: 0.45, ease: "power2.in" });
       };
     </script>
   </div>
