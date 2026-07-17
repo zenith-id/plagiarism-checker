@@ -81,34 +81,29 @@
     }
   </style>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["02-value"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
 
-      // Ring chips spring into place (0.0–2.5s)
       const chips = ["#chip1", "#chip2", "#chip3"];
-      const base = [
-        { x: -19, y: -12 }, { x: 3, y: -16 }, { x: 19, y: -12 }
-      ];
       chips.forEach((sel, i) => {
-        tl.fromTo(sel,
+        tl.fromTo(q(sel),
           { scale: 0, opacity: 0 },
           { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" },
           0.2 + i * 0.22);
       });
 
-      // Gentle orbit of the ring (2.5–5.5s)
-      tl.to(".ring", { rotation: 6, duration: 3.0, ease: "power1.inOut" }, 2.5);
-      tl.to(".ring", { rotation: 0, duration: 3.5, ease: "power1.inOut" }, 5.5);
+      tl.to(q(".ring"), { rotation: 6, duration: 3.0, ease: "power1.inOut" }, 2.5);
+      tl.to(q(".ring"), { rotation: 0, duration: 3.5, ease: "power1.inOut" }, 5.5);
 
-      // Center shield blooms (2.5–5.5s) — the ONE coral moment
-      tl.fromTo("#shield",
+      tl.fromTo(q("#shield"),
         { scale: 0.4, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, 2.7);
 
-      // Hold + subtle jitter (5.5–9.0s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 1.3,
@@ -116,11 +111,11 @@
         ease: "none",
         onUpdate: () => {
           const s = 1 + Math.sin(phase.p) * 0.012;
-          gsap.set("#shield", { scale: s });
+          gsap.set(q("#shield"), { scale: s });
         }
       }, 5.5);
 
       window.__timelines["02-value"] = tl;
-    }
+    };
   </script>
 </template>
