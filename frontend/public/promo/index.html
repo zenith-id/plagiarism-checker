@@ -8,8 +8,11 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { width: 100%; height: 100%; overflow: hidden; background: #faf9f5; }
       #stage { position: relative; width: 100%; height: 100%; overflow: hidden; background: #faf9f5; }
-      .scene { position: absolute; inset: 0; opacity: 0; will-change: opacity; }
-      .scene.is-active { opacity: 1; }
+      .scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; will-change: opacity; }
+      .scene.is-active { opacity: 1; visibility: visible; }
+      /* Fallback: if GSAP fails, still show static content of the active scene. */
+      .scene.is-active .ground,
+      .scene.is-active .stage { opacity: 1 !important; }
     </style>
   </head>
   <body>
@@ -94,19 +97,19 @@
     }
   </style>
 
-  
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["01-hook"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
-      const words = gsap.utils.toArray("#h1 .w");
+      const words = q("#h1 .w");
 
-      // Kicker per-word staggered reveal (0.0–2.0s) — single element, simple fade-up.
-      tl.fromTo("#kicker",
+      tl.fromTo(q("#kicker"),
         { opacity: 0, y: 14 },
         { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
 
-      // H1 word-by-word assembly (2.0–5.0s)
       words.forEach((el, i) => {
         tl.fromTo(el,
           { opacity: 0, y: 26, scale: 0.96 },
@@ -114,12 +117,10 @@
           2.0 + i * 0.32);
       });
 
-      // Slow push on root across the reveal (multi-phase-camera, single steady push)
-      tl.fromTo("#root",
+      tl.fromTo(root,
         { scale: 1.02 },
         { scale: 1, duration: 5.0, ease: "power2.out" }, 2.0);
 
-      // Hold + subtle jitter (5.0–8.0s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 1.1,
@@ -127,14 +128,12 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2.5;
-          words.forEach((el) => {
-            el.style.transform = `translateY(${y}px)`;
-          });
+          words.forEach((el) => { el.style.transform = `translateY(${y}px)`; });
         }
       }, 5.0);
 
       window.__timelines["01-hook"] = tl;
-    }
+    };
   </script></template>
 
     <template id="tpl-02-value"><div id="root" data-composition-id="02-value" data-start="0" data-duration="9.5" data-track-index="0" data-width="1920" data-height="1080">
@@ -219,34 +218,29 @@
     }
   </style>
 
-  
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["02-value"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
 
-      // Ring chips spring into place (0.0–2.5s)
       const chips = ["#chip1", "#chip2", "#chip3"];
-      const base = [
-        { x: -19, y: -12 }, { x: 3, y: -16 }, { x: 19, y: -12 }
-      ];
       chips.forEach((sel, i) => {
-        tl.fromTo(sel,
+        tl.fromTo(q(sel),
           { scale: 0, opacity: 0 },
           { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" },
           0.2 + i * 0.22);
       });
 
-      // Gentle orbit of the ring (2.5–5.5s)
-      tl.to(".ring", { rotation: 6, duration: 3.0, ease: "power1.inOut" }, 2.5);
-      tl.to(".ring", { rotation: 0, duration: 3.5, ease: "power1.inOut" }, 5.5);
+      tl.to(q(".ring"), { rotation: 6, duration: 3.0, ease: "power1.inOut" }, 2.5);
+      tl.to(q(".ring"), { rotation: 0, duration: 3.5, ease: "power1.inOut" }, 5.5);
 
-      // Center shield blooms (2.5–5.5s) — the ONE coral moment
-      tl.fromTo("#shield",
+      tl.fromTo(q("#shield"),
         { scale: 0.4, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out" }, 2.7);
 
-      // Hold + subtle jitter (5.5–9.0s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 1.3,
@@ -254,12 +248,12 @@
         ease: "none",
         onUpdate: () => {
           const s = 1 + Math.sin(phase.p) * 0.012;
-          gsap.set("#shield", { scale: s });
+          gsap.set(q("#shield"), { scale: s });
         }
       }, 5.5);
 
       window.__timelines["02-value"] = tl;
-    }
+    };
   </script></template>
 
     <template id="tpl-03-stats"><div id="root" data-composition-id="03-stats" data-start="0" data-duration="8.5" data-track-index="0" data-width="1920" data-height="1080">
@@ -358,14 +352,15 @@
     }
   </style>
 
-  
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["03-stats"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
 
-      // Hero "200 file/batch" centered count-up (0.0–2.0s)
-      const figure = document.getElementById("figure");
+      const figure = q("#figure")[0];
       const counter = { v: 0 };
       tl.to(counter, {
         v: 200,
@@ -374,21 +369,21 @@
         onUpdate: () => { figure.textContent = Math.round(counter.v); }
       }, 0.1);
       tl.fromTo(figure, { scale: 0.5 }, { scale: 1, duration: 1.8, ease: "power3.out" }, 0.1);
-      tl.fromTo("#title", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
-      tl.fromTo("#row", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.3);
-      tl.fromTo(".tile-hero .unit", { opacity: 0 }, { opacity: 0.78, duration: 0.5 }, 0.9);
+      tl.fromTo(q(".tile-hero"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.1);
+      tl.fromTo(q(".tile-hero .unit"), { opacity: 0 }, { opacity: 0.78, duration: 0.5 }, 0.9);
 
-      // Three more tiles assemble into a row (2.0–5.0s), center-outward
+      tl.fromTo(q("#title"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+      tl.fromTo(q("#row"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.3);
+
       const extras = ["#t2", "#t3", "#t4"];
       extras.forEach((sel, i) => {
         const dir = i === 0 ? -1 : 1;
-        tl.fromTo(sel,
+        tl.fromTo(q(sel),
           { opacity: 0, scale: 0.8, x: dir * 6 },
           { opacity: 1, scale: 1, x: 0, duration: 0.6, ease: "power3.out" },
           2.2 + i * 0.3);
       });
 
-      // Hold + subtle jitter (5.0–8.0s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 1.2,
@@ -396,12 +391,12 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2.5;
-          gsap.set("#row", { y: y });
+          gsap.set(q("#row"), { y: y });
         }
       }, 5.0);
 
       window.__timelines["03-stats"] = tl;
-    }
+    };
   </script></template>
 
     <template id="tpl-04-features"><div id="root" data-composition-id="04-features" data-start="0" data-duration="10.5" data-track-index="0" data-width="1920" data-height="1080">
@@ -507,34 +502,33 @@
     }
   </style>
 
-  
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["04-features"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
 
-      tl.fromTo("#kicker",
+      tl.fromTo(q("#kicker"),
         { opacity: 0, y: 14 },
         { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
 
-      // First card (0.0–2.5s)
-      tl.fromTo("#c1",
+      tl.fromTo(q("#c1"),
         { scale: 0, opacity: 0, y: 16 },
         { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.3);
 
-      // Remaining three cascade from center (2.5–6.5s), back-50% pacing
       const rest = ["#c2", "#c3", "#c4"];
       const dirs = [
         { x: 0, y: -8 }, { x: -8, y: 8 }, { x: 8, y: 8 }
       ];
       rest.forEach((sel, i) => {
-        tl.fromTo(sel,
+        tl.fromTo(q(sel),
           { scale: 0, opacity: 0, x: dirs[i].x, y: dirs[i].y },
           { scale: 1, opacity: 1, x: 0, y: 0, duration: 0.6, ease: "power3.out" },
           2.7 + i * 0.7);
       });
 
-      // Hold + subtle jitter (6.5–10.0s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 1.4,
@@ -542,12 +536,12 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2.5;
-          gsap.set("#grid", { y: y });
+          gsap.set(q("#grid"), { y: y });
         }
       }, 6.5);
 
       window.__timelines["04-features"] = tl;
-    }
+    };
   </script></template>
 
     <template id="tpl-05-howitworks"><div id="root" data-composition-id="05-howitworks" data-start="0" data-duration="10.5" data-track-index="0" data-width="1920" data-height="1080">
@@ -686,40 +680,38 @@
   
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["05-howitworks"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
 
-      // Kicker
-      tl.fromTo("#kicker",
+      tl.fromTo(q("#kicker"),
         { opacity: 0, y: 14 },
         { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
 
-      // Station 1 enters (0.3–0.9s)
-      tl.fromTo("#s1",
+      tl.fromTo(q("#s1"),
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
 
-      // Station 1 → 2: draw connector then reveal station 2 (left-to-right)
-      tl.fromTo("#s2",
+      tl.fromTo(q("#s2"),
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 4.2);
 
-      // Station 2 → 3: draw connector then reveal station 3
-      tl.fromTo("#s3",
+      tl.fromTo(q("#s3"),
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 7.6);
 
-      // SVG path draws
-      ["#path1", "#path2"].forEach((id) => {
-        const p = document.querySelector(id);
+      const p1 = q("#path1")[0];
+      const p2 = q("#path2")[0];
+      [p1, p2].forEach((p) => {
         const len = p.getTotalLength();
         p.style.strokeDasharray = len;
         p.style.strokeDashoffset = len;
       });
-      tl.to("#path1", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 1.0);
-      tl.to("#path2", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 5.0);
+      tl.to(p1, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 1.0);
+      tl.to(p2, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 5.0);
 
-      // Hold + subtle jitter on all stations (after last entry, ~8.2–10s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 0.7,
@@ -727,12 +719,12 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2;
-          gsap.set(["#s1", "#s2", "#s3"], { y: y });
+          gsap.set(q(["#s1", "#s2", "#s3"]), { y: y });
         }
       }, 8.2);
 
       window.__timelines["05-howitworks"] = tl;
-    }
+    };
   </script></template>
 
     <template id="tpl-06-cta"><div id="root" data-composition-id="06-cta" data-start="0" data-duration="10" data-track-index="0" data-width="1920" data-height="1080">
@@ -828,14 +820,15 @@
     }
   </style>
 
-  
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["06-cta"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
-      const words = gsap.utils.toArray("#h1 .w");
+      const words = q("#h1 .w");
 
-      // Headline per-word reveal (0.0–3.0s)
       words.forEach((el, i) => {
         tl.fromTo(el,
           { opacity: 0, y: 26, scale: 0.96 },
@@ -843,30 +836,25 @@
           0.2 + i * 0.34);
       });
 
-      // Button condenses at center from headline weight (3.0–7.0s)
-      tl.fromTo("#button",
+      tl.fromTo(q("#button"),
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 3.2);
 
-      // Cursor arrives + lands click with ripple (3.0–7.0s)
-      tl.fromTo("#cursor",
+      tl.fromTo(q("#cursor"),
         { opacity: 0 },
         { opacity: 1, duration: 0.05, ease: "none" }, 4.6);
-      tl.fromTo("#cursor",
+      tl.fromTo(q("#cursor"),
         { x: -220, y: 120 },
         { x: 0, y: 0, duration: 1.0, ease: "power2.out" }, 4.6);
 
-      // Click depress (sync cursor + button)
-      tl.to(["#cursor", "#button"],
+      tl.to(q(["#cursor", "#button"]),
         { scale: 0.92, duration: 0.1, ease: "power2.in", yoyo: true, repeat: 1 }, 5.9);
 
-      // Ripple expand from click point
-      tl.set("#ripple", { opacity: 1 }, 5.9);
-      tl.fromTo("#ripple",
+      tl.set(q("#ripple"), { opacity: 1 }, 5.9);
+      tl.fromTo(q("#ripple"),
         { scale: 0, opacity: 1 },
         { scale: 5, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 5.9);
 
-      // Hold lit + gentle settle (7.0–10.0s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 1.2,
@@ -874,19 +862,19 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2.5;
-          gsap.set("#button", { y: y });
+          gsap.set(q("#button"), { y: y });
         }
       }, 7.0);
 
       window.__timelines["06-cta"] = tl;
-    }
+    };
   </script></template>
 
 
-    <!-- ===== Player runtime ===== -->
     <script>
       (function () {
         window.__timelines = window.__timelines || {};
+        window.__frameInit = window.__frameInit || {};
         const TOTAL = 55;
         const scenes = Array.from(document.querySelectorAll(".scene"));
         const meta = scenes.map((el) => ({
@@ -896,28 +884,24 @@
           duration: parseFloat(el.dataset.duration),
         }));
 
-        // Clone each template into its scene, then run the frame script.
         function boot() {
           meta.forEach((m) => {
             const tpl = document.getElementById("tpl-" + m.frame);
             if (!tpl) return;
             const node = tpl.content.firstElementChild.cloneNode(true);
             m.el.appendChild(node);
-            const scriptEl = node.querySelector("script");
-            if (scriptEl) {
-              const s = document.createElement("script");
-              s.textContent = scriptEl.textContent;
-              document.body.appendChild(s);
+            const init = window.__frameInit[m.frame];
+            if (init) {
+              try { init(node); } catch (e) { console.error("frame " + m.frame + " init failed", e); }
             }
           });
-          // Defer playback until all frame timelines registered.
           requestAnimationFrame(() => requestAnimationFrame(play));
         }
 
-        let rafId = null;
+        let started = false;
         function play() {
-          const timelines = meta.map((m) => window.__timelines[m.frame]).filter(Boolean);
-          if (timelines.length < meta.length) { requestAnimationFrame(play); return; }
+          if (started) return;
+          started = true;
           let t0 = null;
           function tick(now) {
             if (t0 === null) t0 = now;
@@ -932,16 +916,14 @@
                 tl.time(lt);
               }
             });
-            rafId = requestAnimationFrame(tick);
+            requestAnimationFrame(tick);
           }
-          rafId = requestAnimationFrame(tick);
+          requestAnimationFrame(tick);
         }
 
         if (window.gsap) boot();
         else window.addEventListener("load", () => { if (window.gsap) boot(); });
       })();
     </script>
-  </body>
-  </body>
   </body>
 </html>
