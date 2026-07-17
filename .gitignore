@@ -5,5 +5,5 @@ agent/
 .env
 *.md
 !README.md
-
+!CHANGELOG.md
 assets/
