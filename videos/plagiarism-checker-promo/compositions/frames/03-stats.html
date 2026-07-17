@@ -26,8 +26,10 @@
         position: absolute;
         inset: 0;
         background-color: #faf9f5;
-        background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
-        background-size: 4cqw 4cqw;
+        background-image:
+          linear-gradient(rgba(20,20,19,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20,20,19,0.05) 1px, transparent 1px);
+        background-size: 5cqw 5cqw;
       }
       .stage {
         position: absolute;
@@ -95,6 +97,7 @@
     <script>
       window.__timelines = window.__timelines || {};
       window.__frameInit = window.__frameInit || {};
+      window.__frameOut = window.__frameOut || {};
       window.__frameInit["03-stats"] = function (root) {
         if (!window.gsap) return;
         const q = gsap.utils.selector(root);
@@ -113,7 +116,7 @@
         tl.fromTo(q(".tile-hero .unit"), { opacity: 0 }, { opacity: 0.78, duration: 0.5 }, 0.9);
 
         tl.fromTo(q("#title"), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
-        tl.fromTo(q("#row"), { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.3);
+        tl.fromTo(q("#row"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.3);
 
         const extras = ["#t2", "#t3", "#t4"];
         extras.forEach((sel, i) => {
@@ -136,6 +139,9 @@
         }, 5.0);
 
         window.__timelines["03-stats"] = tl;
+      };
+      window.__frameOut["03-stats"] = function (root) {
+        if (!window.gsap) return gsap.to(root, { opacity: 0, duration: 0.4, ease: "power2.in" });
       };
     </script>
   </div>
