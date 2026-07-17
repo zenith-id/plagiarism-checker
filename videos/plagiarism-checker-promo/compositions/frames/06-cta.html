@@ -1,0 +1,146 @@
+<template>
+  <div id="root" data-composition-id="06-cta" data-start="0" data-duration="10" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+    <div class="stage">
+      <h1 class="h1" id="h1">
+        <span class="w">Siap</span> <span class="w">memeriksa</span> <span class="w">dokumen?</span>
+      </h1>
+      <div class="button" id="button">Buka Aplikasi</div>
+
+      <div class="cursor" id="cursor">
+        <svg width="44" height="44" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 3L19 12L12 13L9 20L5 3Z" fill="#141413" stroke="#faf9f5" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ripple" id="ripple"></div>
+    </div>
+  </div>
+
+  <style>
+    #root {
+      container-type: size;
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      font-family: Georgia, serif;
+    }
+    .ground {
+      position: absolute;
+      inset: 0;
+      background: #faf9f5;
+    }
+    .stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4cqw;
+    }
+    .h1 {
+      font-family: Georgia, serif;
+      font-weight: 400;
+      font-size: 6.7cqw;
+      line-height: 1.05;
+      letter-spacing: -0.012em;
+      color: #141413;
+      margin: 0;
+      text-align: center;
+    }
+    .h1 .w {
+      display: inline-block;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .button {
+      font-family: Georgia, serif;
+      font-size: 2.6cqw;
+      color: #faf9f5;
+      background: #cc785c;
+      padding: 1.6cqw 4cqw;
+      border-radius: 9999px;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .cursor {
+      position: absolute;
+      left: 30%;
+      top: 62%;
+      width: 44px;
+      height: 44px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9;
+      will-change: transform, opacity;
+    }
+    .ripple {
+      position: absolute;
+      left: 50%;
+      top: 58%;
+      width: 120px;
+      height: 120px;
+      margin: -60px 0 0 -60px;
+      border-radius: 50%;
+      border: 2px solid #cc785c;
+      opacity: 0;
+      transform: scale(0);
+      pointer-events: none;
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    if (window.gsap) {
+      const tl = gsap.timeline({ paused: true });
+      const words = gsap.utils.toArray("#h1 .w");
+
+      // Headline per-word reveal (0.0–3.0s)
+      words.forEach((el, i) => {
+        tl.fromTo(el,
+          { opacity: 0, y: 26, scale: 0.96 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" },
+          0.2 + i * 0.34);
+      });
+
+      // Button condenses at center from headline weight (3.0–7.0s)
+      tl.fromTo("#button",
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 3.2);
+
+      // Cursor arrives + lands click with ripple (3.0–7.0s)
+      tl.fromTo("#cursor",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.05, ease: "none" }, 4.6);
+      tl.fromTo("#cursor",
+        { x: -220, y: 120 },
+        { x: 0, y: 0, duration: 1.0, ease: "power2.out" }, 4.6);
+
+      // Click depress (sync cursor + button)
+      tl.to(["#cursor", "#button"],
+        { scale: 0.92, duration: 0.1, ease: "power2.in", yoyo: true, repeat: 1 }, 5.9);
+
+      // Ripple expand from click point
+      tl.set("#ripple", { opacity: 1 }, 5.9);
+      tl.fromTo("#ripple",
+        { scale: 0, opacity: 1 },
+        { scale: 5, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 5.9);
+
+      // Hold lit + gentle settle (7.0–10.0s)
+      const phase = { p: 0 };
+      tl.to(phase, {
+        p: Math.PI * 2 * 1.2,
+        duration: 3.0,
+        ease: "none",
+        onUpdate: () => {
+          const y = Math.sin(phase.p) * 2.5;
+          gsap.set("#button", { y: y });
+        }
+      }, 7.0);
+
+      window.__timelines["06-cta"] = tl;
+    }
+  </script>
+</template>
