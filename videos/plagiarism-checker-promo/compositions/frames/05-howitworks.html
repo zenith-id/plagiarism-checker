@@ -4,23 +4,26 @@
 
     <div class="viewport" id="viewport">
       <div class="canvas">
-        <div class="station" id="s1" style="left: 8cqw;">
-          <div class="badge">1</div>
-          <div class="st">Unggah dokumen</div>
-        </div>
-        <svg class="connector" id="conn1" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path id="path1" d="M 26 50 L 50 50" />
-        </svg>
-        <div class="station" id="s2" style="left: 41cqw;">
-          <div class="badge">2</div>
-          <div class="st">Analisis otomatis</div>
-        </div>
-        <svg class="connector" id="conn2" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path id="path2" d="M 59 50 L 83 50" />
-        </svg>
-        <div class="station" id="s3" style="left: 74cqw;">
-          <div class="badge">3</div>
-          <div class="st">Tinjau & ekspor</div>
+        <div class="kicker" id="kicker"><span class="star">✱</span> Cara kerja</div>
+        <div class="track">
+          <div class="station" id="s1" style="left: 1cqw;">
+            <div class="badge">1</div>
+            <div class="st">Unggah dokumen</div>
+          </div>
+          <svg class="connector" id="conn1" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="path1" d="M 26 50 L 50 50" />
+          </svg>
+          <div class="station" id="s2" style="left: 38cqw;">
+            <div class="badge">2</div>
+            <div class="st">Analisis otomatis</div>
+          </div>
+          <svg class="connector" id="conn2" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path id="path2" d="M 59 50 L 83 50" />
+          </svg>
+          <div class="station" id="s3" style="left: 75cqw;">
+            <div class="badge">3</div>
+            <div class="st">Tinjau & ekspor</div>
+          </div>
         </div>
       </div>
     </div>
@@ -38,7 +41,9 @@
     .ground {
       position: absolute;
       inset: 0;
-      background: #faf9f5;
+      background-color: #faf9f5;
+      background-image: radial-gradient(circle, rgba(93,184,166,0.18) 1px, transparent 1.4px);
+      background-size: 4cqw 4cqw;
     }
     .viewport {
       position: absolute;
@@ -49,13 +54,34 @@
     }
     .canvas {
       position: relative;
-      width: 110cqw;
-      height: 40cqw;
+      width: 100cqw;
+      height: 44cqw;
+    }
+    .kicker {
+      position: absolute;
+      top: 2cqw;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 1.46cqw;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #141413;
+      opacity: 0;
+    }
+    .kicker .star { color: #cc785c; margin-right: 0.4cqw; }
+    .track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 16cqw;
+      transform: translateY(-50%);
     }
     .station {
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
+      top: 0;
       width: 24cqw;
       height: 16cqw;
       background: #faf9f5;
@@ -92,13 +118,13 @@
       position: absolute;
       top: 50%;
       height: 6cqw;
-      width: 33cqw;
+      width: 13cqw;
       transform: translateY(-50%);
       overflow: visible;
       pointer-events: none;
     }
-    #conn1 { left: 24cqw; }
-    #conn2 { left: 57cqw; }
+    #conn1 { left: 25cqw; }
+    #conn2 { left: 62cqw; }
     .connector path {
       fill: none;
       stroke: #a9583e;
@@ -113,19 +139,22 @@
     if (window.gsap) {
       const tl = gsap.timeline({ paused: true });
 
-      // Station 1 enters + camera holds on it (0.0–3.0s)
+      // Kicker
+      tl.fromTo("#kicker",
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+
+      // Station 1 enters (0.3–0.9s)
       tl.fromTo("#s1",
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
 
-      // Pan right to station 2 (3.0–6.5s) + draw connector 1→2
-      tl.to("#viewport", { x: -384, duration: 1.2, ease: "power2.inOut" }, 3.4);
+      // Station 1 → 2: draw connector then reveal station 2 (left-to-right)
       tl.fromTo("#s2",
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 4.2);
 
-      // Pan to station 3 (6.5–10.0s) + draw connector 2→3
-      tl.to("#viewport", { x: -768, duration: 1.2, ease: "power2.inOut" }, 6.8);
+      // Station 2 → 3: draw connector then reveal station 3
       tl.fromTo("#s3",
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 7.6);
@@ -137,10 +166,10 @@
         p.style.strokeDasharray = len;
         p.style.strokeDashoffset = len;
       });
-      tl.to("#path1", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 4.4);
-      tl.to("#path2", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 7.8);
+      tl.to("#path1", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 1.0);
+      tl.to("#path2", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 5.0);
 
-      // Hold + subtle jitter on stations (after last entry, ~8.2–10s)
+      // Hold + subtle jitter on all stations (after last entry, ~8.2–10s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 0.7,
@@ -148,7 +177,7 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2;
-          gsap.set("#s3", { y: y });
+          gsap.set(["#s1", "#s2", "#s3"], { y: y });
         }
       }, 8.2);
 
