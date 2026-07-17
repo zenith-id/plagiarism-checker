@@ -55,8 +55,8 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 3.5cqw;
-        padding: 0 8cqw;
+        gap: 2.4cqw;
+        padding: 4cqw 8cqw;
         text-align: center;
       }
       .kicker {
@@ -73,11 +73,11 @@
       .h1 {
         font-family: Georgia, serif;
         font-weight: 400;
-        font-size: 4.6cqw;
-        line-height: 1.16;
+        font-size: 3.7cqw;
+        line-height: 1.14;
         letter-spacing: -0.018em;
         color: #141413;
-        max-width: 78cqw;
+        max-width: 88cqw;
         margin: 0;
       }
       .h1 .w {
@@ -842,13 +842,12 @@
         const tl = gsap.timeline({ paused: true });
         const words = q("#h1 .w");
 
-        // Anchor cursor to the real center of the button.
+        // Anchor cursor + ripple to the real center of the button using layout
+        // offsets (unaffected by GSAP transforms like scale:0 at init time).
         const btn = q("#button")[0];
         const cur = q("#cursor")[0];
-        const rRoot = root.getBoundingClientRect();
-        const rBtn = btn.getBoundingClientRect();
-        const cx = rBtn.left - rRoot.left + rBtn.width / 2;
-        const cy = rBtn.top - rRoot.top + rBtn.height / 2;
+        const cx = btn.offsetLeft + btn.offsetWidth / 2;
+        const cy = btn.offsetTop + btn.offsetHeight / 2;
         cur.style.left = cx + "px";
         cur.style.top = cy + "px";
         const rRipple = q("#ripple")[0];
