@@ -1,0 +1,110 @@
+<template>
+  <div id="root" data-composition-id="01-hook" data-start="0" data-duration="8.5" data-track-index="0" data-width="1920" data-height="1080">
+    <div class="ground clip" data-start="0" data-duration="8" data-track-index="0"></div>
+
+    <div class="stage">
+      <div class="kicker" id="kicker"><span class="star">✱</span> Deteksi plagiarisme tugas mahasiswa</div>
+      <h1 class="h1" id="h1">
+        <span class="w">Cek</span> <span class="w">kemiripan</span> <span class="w">dokumen</span>
+        <span class="w">secara</span> <span class="w">massal,</span> <span class="w">cepat,</span>
+        <span class="w">dan</span> <span class="w">lokal.</span>
+      </h1>
+    </div>
+  </div>
+
+  <style>
+    #root {
+      container-type: size;
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      font-family: Georgia, serif;
+    }
+    .ground {
+      position: absolute;
+      inset: 0;
+      background: #faf9f5;
+    }
+    .stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3.5cqw;
+      padding: 0 8cqw;
+      text-align: center;
+    }
+    .kicker {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 1.46cqw;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #141413;
+      opacity: 0;
+    }
+    .kicker .star {
+      color: #cc785c;
+      margin-right: 0.4cqw;
+    }
+    .h1 {
+      font-family: Georgia, serif;
+      font-weight: 400;
+      font-size: 4.6cqw;
+      line-height: 1.12;
+      letter-spacing: -0.018em;
+      color: #141413;
+      max-width: 80cqw;
+      margin: 0;
+    }
+    .h1 .w {
+      display: inline-block;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    if (window.gsap) {
+      const tl = gsap.timeline({ paused: true });
+      const words = gsap.utils.toArray("#h1 .w");
+
+      // Kicker per-word staggered reveal (0.0–2.0s) — single element, simple fade-up.
+      tl.fromTo("#kicker",
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+
+      // H1 word-by-word assembly (2.0–5.0s)
+      words.forEach((el, i) => {
+        tl.fromTo(el,
+          { opacity: 0, y: 26, scale: 0.96 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" },
+          2.0 + i * 0.32);
+      });
+
+      // Slow push on root across the reveal (multi-phase-camera, single steady push)
+      tl.fromTo("#root",
+        { scale: 1.02 },
+        { scale: 1, duration: 5.0, ease: "power2.out" }, 2.0);
+
+      // Hold + subtle jitter (5.0–8.0s)
+      const phase = { p: 0 };
+      tl.to(phase, {
+        p: Math.PI * 2 * 1.1,
+        duration: 3.0,
+        ease: "none",
+        onUpdate: () => {
+          const y = Math.sin(phase.p) * 2.5;
+          words.forEach((el) => {
+            el.style.transform = `translateY(${y}px)`;
+          });
+        }
+      }, 5.0);
+
+      window.__timelines["01-hook"] = tl;
+    }
+  </script>
+</template>
