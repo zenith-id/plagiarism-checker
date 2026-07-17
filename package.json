@@ -1,6 +1,7 @@
 {
   "name": "plagiarism-checker-monorepo",
   "private": true,
+  "version": "1.0.1",
   "workspaces": [
     "backend",
     "frontend"
