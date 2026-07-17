@@ -135,40 +135,38 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["05-howitworks"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
 
-      // Kicker
-      tl.fromTo("#kicker",
+      tl.fromTo(q("#kicker"),
         { opacity: 0, y: 14 },
         { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
 
-      // Station 1 enters (0.3–0.9s)
-      tl.fromTo("#s1",
+      tl.fromTo(q("#s1"),
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.3);
 
-      // Station 1 → 2: draw connector then reveal station 2 (left-to-right)
-      tl.fromTo("#s2",
+      tl.fromTo(q("#s2"),
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 4.2);
 
-      // Station 2 → 3: draw connector then reveal station 3
-      tl.fromTo("#s3",
+      tl.fromTo(q("#s3"),
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.6, ease: "power3.out" }, 7.6);
 
-      // SVG path draws
-      ["#path1", "#path2"].forEach((id) => {
-        const p = document.querySelector(id);
+      const p1 = q("#path1")[0];
+      const p2 = q("#path2")[0];
+      [p1, p2].forEach((p) => {
         const len = p.getTotalLength();
         p.style.strokeDasharray = len;
         p.style.strokeDashoffset = len;
       });
-      tl.to("#path1", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 1.0);
-      tl.to("#path2", { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 5.0);
+      tl.to(p1, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 1.0);
+      tl.to(p2, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out" }, 5.0);
 
-      // Hold + subtle jitter on all stations (after last entry, ~8.2–10s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 0.7,
@@ -176,11 +174,11 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2;
-          gsap.set(["#s1", "#s2", "#s3"], { y: y });
+          gsap.set(q(["#s1", "#s2", "#s3"]), { y: y });
         }
       }, 8.2);
 
       window.__timelines["05-howitworks"] = tl;
-    }
+    };
   </script>
 </template>

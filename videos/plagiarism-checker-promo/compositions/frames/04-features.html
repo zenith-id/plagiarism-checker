@@ -102,34 +102,33 @@
     }
   </style>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["04-features"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
 
-      tl.fromTo("#kicker",
+      tl.fromTo(q("#kicker"),
         { opacity: 0, y: 14 },
         { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 0.1);
 
-      // First card (0.0–2.5s)
-      tl.fromTo("#c1",
+      tl.fromTo(q("#c1"),
         { scale: 0, opacity: 0, y: 16 },
         { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.3);
 
-      // Remaining three cascade from center (2.5–6.5s), back-50% pacing
       const rest = ["#c2", "#c3", "#c4"];
       const dirs = [
         { x: 0, y: -8 }, { x: -8, y: 8 }, { x: 8, y: 8 }
       ];
       rest.forEach((sel, i) => {
-        tl.fromTo(sel,
+        tl.fromTo(q(sel),
           { scale: 0, opacity: 0, x: dirs[i].x, y: dirs[i].y },
           { scale: 1, opacity: 1, x: 0, y: 0, duration: 0.6, ease: "power3.out" },
           2.7 + i * 0.7);
       });
 
-      // Hold + subtle jitter (6.5–10.0s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 1.4,
@@ -137,11 +136,11 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2.5;
-          gsap.set("#grid", { y: y });
+          gsap.set(q("#grid"), { y: y });
         }
       }, 6.5);
 
       window.__timelines["04-features"] = tl;
-    }
+    };
   </script>
 </template>

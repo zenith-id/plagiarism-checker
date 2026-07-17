@@ -92,14 +92,15 @@
     }
   </style>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
     window.__timelines = window.__timelines || {};
-    if (window.gsap) {
+    window.__frameInit = window.__frameInit || {};
+    window.__frameInit["06-cta"] = function (root) {
+      if (!window.gsap) return;
+      const q = gsap.utils.selector(root);
       const tl = gsap.timeline({ paused: true });
-      const words = gsap.utils.toArray("#h1 .w");
+      const words = q("#h1 .w");
 
-      // Headline per-word reveal (0.0–3.0s)
       words.forEach((el, i) => {
         tl.fromTo(el,
           { opacity: 0, y: 26, scale: 0.96 },
@@ -107,30 +108,25 @@
           0.2 + i * 0.34);
       });
 
-      // Button condenses at center from headline weight (3.0–7.0s)
-      tl.fromTo("#button",
+      tl.fromTo(q("#button"),
         { scale: 0, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.7, ease: "power3.out" }, 3.2);
 
-      // Cursor arrives + lands click with ripple (3.0–7.0s)
-      tl.fromTo("#cursor",
+      tl.fromTo(q("#cursor"),
         { opacity: 0 },
         { opacity: 1, duration: 0.05, ease: "none" }, 4.6);
-      tl.fromTo("#cursor",
+      tl.fromTo(q("#cursor"),
         { x: -220, y: 120 },
         { x: 0, y: 0, duration: 1.0, ease: "power2.out" }, 4.6);
 
-      // Click depress (sync cursor + button)
-      tl.to(["#cursor", "#button"],
+      tl.to(q(["#cursor", "#button"]),
         { scale: 0.92, duration: 0.1, ease: "power2.in", yoyo: true, repeat: 1 }, 5.9);
 
-      // Ripple expand from click point
-      tl.set("#ripple", { opacity: 1 }, 5.9);
-      tl.fromTo("#ripple",
+      tl.set(q("#ripple"), { opacity: 1 }, 5.9);
+      tl.fromTo(q("#ripple"),
         { scale: 0, opacity: 1 },
         { scale: 5, opacity: 0, duration: 0.8, ease: "power2.out", immediateRender: false }, 5.9);
 
-      // Hold lit + gentle settle (7.0–10.0s)
       const phase = { p: 0 };
       tl.to(phase, {
         p: Math.PI * 2 * 1.2,
@@ -138,11 +134,11 @@
         ease: "none",
         onUpdate: () => {
           const y = Math.sin(phase.p) * 2.5;
-          gsap.set("#button", { y: y });
+          gsap.set(q("#button"), { y: y });
         }
       }, 7.0);
 
       window.__timelines["06-cta"] = tl;
-    }
+    };
   </script>
 </template>
